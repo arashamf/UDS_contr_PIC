@@ -1,0 +1,34 @@
+_open_port:
+  begin
+//open_port.c,17 :: 		if(fMasterKey==1) {return;}           // нельз€ открывать и закрывать €чейки когда повернут мастер ключ
+	if ( _fMasterKey != 1) then goto L_open_port_0
+	return
+L_open_port_0:
+//open_port.c,18 :: 		if (cellCommand[cmd_port_num] == 1) {return;}  // чо открывать если уже и так открыто
+	FSR0L <-  0 + FARG_open_port+0
+	STACK_1 <- *FSR0L
+	if ( STACK_1 != 1) then goto L_open_port_1
+	return
+L_open_port_1:
+//open_port.c,20 :: 		cellCommand[cmd_port_num] = 1;
+	FSR1L <-  0 + FARG_open_port+0
+	*FSR1L <- 1
+  end
+
+_close_port:
+  begin
+//open_port.c,28 :: 		if(fMasterKey==1) {return;}           // нельз€ открывать и закрывать €чейки когда повернут мастер ключ
+	if ( _fMasterKey != 1) then goto L_close_port_2
+	return
+L_close_port_2:
+//open_port.c,29 :: 		if (cellCommand[cmd_port_num] == 0) {return;}
+	FSR0L <-  0 + FARG_close_port+0
+	STACK_1 <- *FSR0L
+	if ( STACK_1 != 0) then goto L_close_port_3
+	return
+L_close_port_3:
+//open_port.c,30 :: 		cellCommand[cmd_port_num] = 0;
+	FSR1L <-  0 + FARG_close_port+0
+	*FSR1L <- 0
+  end
+

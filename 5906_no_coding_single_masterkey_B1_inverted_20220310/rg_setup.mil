@@ -1,0 +1,49 @@
+_rg_setup:
+  begin
+//rg_setup.c,17 :: 		for (i=40; i>0; i--)  // i-1 = номер в регистрах сдвига
+	rg_setup_i_L0 <- 40
+L_rg_setup_0:
+	if ( rg_setup_i_L0 <= 0) then goto L_rg_setup_1
+//rg_setup.c,19 :: 		SIN = ventil[RG_RENUM[i-1] +1] &1;    //  RG_RENUM[i-1]   = OUT number
+	STACK_0 <-  rg_setup_i_L0 - 1
+	STACK_0 <-  0 + STACK_0
+	STACK_0 <- *STACK_0
+	STACK_0 <-  STACK_0 + 1
+	FSR0L <-  0 + STACK_0
+	STACK_0 <- *FSR0L
+	STACK_0 <-  STACK_0 & 1
+	PORTB <- setbit(STACK_0)
+//rg_setup.c,20 :: 		asm nop;
+	asm: nop
+//rg_setup.c,21 :: 		asm nop;
+	asm: nop
+//rg_setup.c,22 :: 		SRCLK = 1;                  // WRITE TO REGISTER
+	PORTB <-  PORTB | 4
+//rg_setup.c,23 :: 		asm nop;
+	asm: nop
+//rg_setup.c,24 :: 		asm nop;
+	asm: nop
+//rg_setup.c,25 :: 		SRCLK = 0;
+	PORTB <-  PORTB & -5
+//rg_setup.c,26 :: 		asm nop;
+	asm: nop
+//rg_setup.c,27 :: 		asm nop;
+	asm: nop
+//rg_setup.c,28 :: 		}
+L_rg_setup_2:
+//rg_setup.c,17 :: 		for (i=40; i>0; i--)  // i-1 = номер в регистрах сдвига
+	rg_setup_i_L0 <-  rg_setup_i_L0 - 1
+	rg_setup_i_L0 <- rg_setup_i_L0
+//rg_setup.c,28 :: 		}
+	goto	L_rg_setup_0
+L_rg_setup_1:
+//rg_setup.c,29 :: 		RCLK = 1;  // WRITE TO PARALLEL BUFFER
+	PORTB <-  PORTB | 8
+//rg_setup.c,30 :: 		asm nop;
+	asm: nop
+//rg_setup.c,31 :: 		asm nop;
+	asm: nop
+//rg_setup.c,32 :: 		RCLK = 0;
+	PORTB <-  PORTB & -9
+  end
+

@@ -1,0 +1,66 @@
+[DeviceName]
+Value=P18F97J60
+[DeviceClock]
+Value=25
+[MainUnit]
+Value=test18f97.c
+[DeviceFlags]
+Count=11
+Value0=_DEBUG_OFF_1L = $00FF
+Value1=_XINST_OFF_1L = $00BF
+Value2=_STVREN_ON_1L = $00FF
+Value3=_WDTEN_ON_1L = $00FF
+Value4=_CP0_OFF_1H = $00FF
+Value5=_IESO_ON_2L = $00FF
+Value6=_FCMEN_OFF_2L = $00BF
+Value7=_FOSC2_ON_2L = $00FF
+Value8=_FOSC_HS_2L = $00FC
+Value9=_WDTPS_2048_2H = $00FB
+Value10=_ETHLED_RA0_RA1_3H = $00FF
+[BuildType]
+bType=0
+[ProjectFiles]
+Count=12
+Value0=test18f97.c
+Value1=line_analyze.c
+Value2=ethernet.c
+Value3=pwr_analize.c
+Value4=open_port.c
+Value5=log.c
+Value6=rtc.c
+Value7=ip_set.c
+Value8=eeprom.c
+Value9=termo.c
+Value10=set_fnum.c
+Value11=USART.c
+Value12=USART.c
+[HeaderFiles]
+Count=1
+Value0=D:\сдя\он\5906_no_coding_20170206\USART.h
+[ObjLibFiles]
+Count=0
+[PLDFiles]
+Count=0
+[EEPROMinfo]
+isused=0
+[SearchPath]
+Count=17
+Value0=D:\MikroC8\Defs\
+Value1=D:\MikroC8\Uses\p18\
+Value2=D:\сдя\он\5906_no_coding_single_masterkey_20170821\
+Value3=D:\сдя\он\5906_no_coding_20170206\
+Value4=C:\MikroC8\Defs\
+Value5=C:\MikroC8\Uses\p18\
+Value6=D:\_BOB\___WORK\_FORMAT_3\50ver\
+Value7=D:\_BOB\___WORK\_FORMAT_2\39 ver\
+Value8=D:\_BOB\___WORK\__format ETHERNET\31_test\
+Value9=D:\_BOB\___WORK\_RTC EEPROM\30_testIP\
+Value10=D:\_BOB\___WORK\_RTC EEPROM\25_test\
+Value11=D:\_BOB\___WORK\CF_I2C\17_test_cf\
+Value12=D:\_BOB\___WORK\CF_I2C\16_test_cf\
+Value13=D:\_BOB\___WORK\18F__97\5_test\
+Value14=C:\_BOB\___WORK\18F__97\4_test\
+Value15=C:\_BOB\___WORK\18F__97\2_test_ADR_RELE\
+Value16=C:\_BOB\___WORK\test18f97\
+[IncludePath]
+Count=0

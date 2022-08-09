@@ -1,0 +1,992 @@
+_InitPort:
+  begin
+//test18f97.c,12 :: 		ADCON1 = 0x0F ;         //  АЦП отключены
+	ADCON1 <- 15
+//test18f97.c,13 :: 		CMCON  = 0x07 ;         //  внутренние компараторы отключены
+	CMCON <- 7
+//test18f97.c,14 :: 		PORTA.F7 = 1;           //  RA7=1 PJPU ,
+	PORTA <-  PORTA | 128
+//test18f97.c,15 :: 		LATA =0b00000000;       //  LATA7=1 PDPU ,  LATA6=1 PEPU ,
+	LATA <- 0
+//test18f97.c,16 :: 		TRISA=0b11111100;       // RA5 <- FB_B, RA4 <- FB_A
+	TRISA <- 252
+//test18f97.c,18 :: 		LATB =0b00000000;
+	LATB <- 0
+//test18f97.c,19 :: 		TRISB=0b00110001;       // RB3 -> RCLK, RB2 -> SRCLK, RB1 -> SIN, RB0 <- SOUT
+	TRISB <- 49
+//test18f97.c,21 :: 		LATC =0b00011111;       //  LEDS - G, R, Y - OFF
+	LATC <- 31
+//test18f97.c,22 :: 		TRISC=0b10111000;       // RC2..0 -> LEDS - G, R, Y - OUTPUT, RC4..3 <- INPUTs for I2C
+	TRISC <- 184
+//test18f97.c,24 :: 		LATD =0b00000000;
+	LATD <- 0
+//test18f97.c,25 :: 		TRISD=0b10100000;       // RD7 <-  TERMO,  RD6 -> VLO_CTL, RD5 <- CP_OUT, RD4 -> VSW_CTL,
+	TRISD <- 160
+//test18f97.c,27 :: 		LATE =0b00000000;
+	LATE <- 0
+//test18f97.c,28 :: 		TRISE=0b11111111;       //
+	TRISE <- 255
+//test18f97.c,30 :: 		LATF =0b01101100;       // выбран шлейф 1
+	LATF <- 108
+//test18f97.c,31 :: 		TRISF=0b00000011;       // RF7..2 -> FBS
+	TRISF <- 3
+//test18f97.c,33 :: 		LATG =0b11011111;       //                 RG6 -> REN_=1, RG5 -> SRCLR_=0
+	LATG <- 223
+//test18f97.c,34 :: 		TRISG=0b10011111;       // RG7 <- VLO_OK,  RG6 -> REN_, RG5 -> SRCLR_
+	TRISG <- 159
+//test18f97.c,36 :: 		LATH =0b00000000;
+	LATH <- 0
+//test18f97.c,37 :: 		TRISH=0b11111111;       //
+	TRISH <- 255
+//test18f97.c,39 :: 		LATJ =0b00000000;
+	LATJ <- 0
+//test18f97.c,40 :: 		TRISJ=0b11111111;       // RJ7 <- VHI_OK,  RJ5 <- SW2, RJ4 <- SW3, RJ1 <- SW0, RJ0 <- SW1
+	TRISJ <- 255
+  end
+
+_InitBoard:
+  begin
+//test18f97.c,48 :: 		for (i=0; i<15; i++)
+	InitBoard_i_L0 <- 0
+L_InitBoard_0:
+	if ( InitBoard_i_L0 >= 15) then goto L_InitBoard_1
+//test18f97.c,50 :: 		cellState[i][0]=cellState[i][1]=cellState[i][2]=cellState[i][3]=cellState[i][4]= 0;
+	STACK_0 <-  5 * InitBoard_i_L0
+	STACK_0 <-  0 + STACK_0
+	STACK_8 <- STACK_0
+	STACK_6 <-  STACK_0 + 1
+	STACK_4 <-  STACK_0 + 2
+	STACK_2 <-  STACK_0 + 3
+	STACK_0 <-  STACK_0 + 4
+	*STACK_0 <- 0
+	STACK_0 <- *STACK_0
+	*STACK_2 <- STACK_0
+	STACK_0 <- *STACK_2
+	*STACK_4 <- STACK_0
+	STACK_0 <- *STACK_4
+	*STACK_6 <- STACK_0
+	STACK_0 <- *STACK_6
+	*STACK_8 <- STACK_0
+//test18f97.c,51 :: 		prevCellState[i][0]=prevCellState[i][1]=prevCellState[i][2]=prevCellState[i][3]=prevCellState[i][4]= 0;
+	STACK_0 <-  5 * InitBoard_i_L0
+	STACK_0 <-  0 + STACK_0
+	STACK_8 <- STACK_0
+	STACK_6 <-  STACK_0 + 1
+	STACK_4 <-  STACK_0 + 2
+	STACK_2 <-  STACK_0 + 3
+	STACK_0 <-  STACK_0 + 4
+	*STACK_0 <- 0
+	STACK_0 <- *STACK_0
+	*STACK_2 <- STACK_0
+	STACK_0 <- *STACK_2
+	*STACK_4 <- STACK_0
+	STACK_0 <- *STACK_4
+	*STACK_6 <- STACK_0
+	STACK_0 <- *STACK_6
+	*STACK_8 <- STACK_0
+//test18f97.c,52 :: 		chkSum1[i] = chkSum2[i] = 0;
+	STACK_0 <-  2 * InitBoard_i_L0
+	STACK_2 <-  0 + STACK_0
+	STACK_0 <-  0 + STACK_0
+	*STACK_0 <- 0
+	STACK_0 <- *STACK_0
+	*STACK_2 <- STACK_0
+//test18f97.c,53 :: 		cellCommand[i] = 0;
+	FSR1L <-  0 + InitBoard_i_L0
+	*FSR1L <- 0
+//test18f97.c,54 :: 		}
+L_InitBoard_2:
+//test18f97.c,48 :: 		for (i=0; i<15; i++)
+	InitBoard_i_L0 <-  InitBoard_i_L0 + 1
+	InitBoard_i_L0 <- InitBoard_i_L0
+//test18f97.c,54 :: 		}
+	goto	L_InitBoard_0
+L_InitBoard_1:
+//test18f97.c,55 :: 		rxBuf[0]='8';rxBuf[1]='8';rxBuf[2]='8';rxBuf[3]='8';rxBuf[4]='8';rxBuf[5]='8';
+	_rxBuf <- 56
+	_rxBuf+1 <- 56
+	_rxBuf+2 <- 56
+	_rxBuf+3 <- 56
+	_rxBuf+4 <- 56
+	_rxBuf+5 <- 56
+//test18f97.c,57 :: 		REN_ = 1;  // TURN ON/OFF CMOS VENTILES  =0/1
+	PORTG <-  PORTG | 64
+//test18f97.c,58 :: 		Delay_us(1);  /* 1 microsecond pause */
+	asm: MOVLW	1
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,59 :: 		SRCLR_= 0;   // RESET REGISTERS
+	PORTG <-  PORTG & -33
+//test18f97.c,60 :: 		Delay_us(1);  /* 1 microsecond pause */
+	asm: MOVLW	1
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,61 :: 		SRCLR_= 1;
+	PORTG <-  PORTG | 32
+//test18f97.c,62 :: 		Delay_us(1);  /* 1 microsecond pause */
+	asm: MOVLW	1
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,63 :: 		Delay_us(1);  /* 1 microsecond pause */
+	asm: MOVLW	1
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,64 :: 		REN_ = 0;  // // TURN ON/OFF CMOS VENTILES  =0/1
+	PORTG <-  PORTG & -65
+//test18f97.c,66 :: 		CP_CTL0=1; //  установка порога сраб защиты по току
+	PORTD <-  PORTD | 2
+//test18f97.c,67 :: 		CP_CTL1=1; //
+	PORTD <-  PORTD | 4
+//test18f97.c,68 :: 		CP_CTL2=1; //
+	PORTD <-  PORTD | 8
+//test18f97.c,69 :: 		CP_RST_=1; //  сброс защелки  защиты по току
+	PORTD <-  PORTD | 1
+//test18f97.c,70 :: 		while(i<100) i++;  // задержка
+L_InitBoard_3:
+	if ( InitBoard_i_L0 >= 100) then goto L_InitBoard_4
+	InitBoard_i_L0 <-  InitBoard_i_L0 + 1
+	InitBoard_i_L0 <- InitBoard_i_L0
+	goto	L_InitBoard_3
+L_InitBoard_4:
+//test18f97.c,71 :: 		CP_RST_=0; //
+	PORTD <-  PORTD & -2
+//test18f97.c,72 :: 		VLO_CTL = 1;     // 12вольт
+	PORTD <-  PORTD | 64
+//test18f97.c,74 :: 		PIR1=0;                                  //Очистили флаги прерываний
+	PIR1 <- 0
+//test18f97.c,75 :: 		PIR2=0;
+	PIR2 <- 0
+//test18f97.c,76 :: 		PIR3=0;
+	PIR3 <- 0
+//test18f97.c,77 :: 		PIE1=0b00000001;                         //Разрешили прерывания от TMR1
+	PIE1 <- 1
+//test18f97.c,78 :: 		PIE2=0;                                  //Остальные запретили
+	PIE2 <- 0
+//test18f97.c,79 :: 		PIE3=0;                                  //Инициализация TCP-IP пусть сама себе разрешает
+	PIE3 <- 0
+//test18f97.c,80 :: 		IPR1.RC1IP = 1;                          //Прерывания по RX USART1 имеют высокий приоритет
+	IPR1 <-  IPR1 | 32
+//test18f97.c,81 :: 		IPR2.ETHIP = 1;                          //Ethernet модуль имеет высокий приоритет
+	IPR2 <-  IPR2 | 32
+  end
+
+_SetTimer100us:
+  begin
+//test18f97.c,90 :: 		T1CON=0b00000100;
+	T1CON <- 4
+//test18f97.c,91 :: 		tmp = 65535 - value*624;
+	STACK_0 <-  FARG_SetTimer100us+0 * 624
+	STACK_3 <-  65535 - STACK_0
+//test18f97.c,92 :: 		TMR1H=(unsigned char) (tmp>>8);
+	STACK_2 <- 8
+	STACK_0 <-  STACK_3 shr STACK_2
+	TMR1H <- STACK_0
+//test18f97.c,93 :: 		TMR1L=(unsigned char) tmp;
+	TMR1L <- STACK_3
+//test18f97.c,94 :: 		timer1Flag=0;
+	_timer1Flag <- 0
+//test18f97.c,95 :: 		T1CON.TMR1ON=1; // Запускаем таймер 1
+	T1CON <-  T1CON | 1
+  end
+
+_SaveCellState:
+  begin
+//test18f97.c,103 :: 		chkSum1[number] = rxBuf[1] + rxBuf[2] + rxBuf[3] + rxBuf[4] + rxBuf[5];   // контрольная сумма
+	STACK_0 <-  2 * FARG_SaveCellState+0
+	FSR1L <-  0 + STACK_0
+	STACK_0 <-  _rxBuf+1 + _rxBuf+2
+	STACK_0 <-  STACK_0 + _rxBuf+3
+	STACK_0 <-  STACK_0 + _rxBuf+4
+	STACK_0 <-  STACK_0 + _rxBuf+5
+	*FSR1L <- STACK_0
+//test18f97.c,104 :: 		if(chkSum1[number]==chkSum2[number]) {                                    // если в прошлый раз контрольная сумма была такой же
+	STACK_0 <-  2 * FARG_SaveCellState+0
+	FSR0L <-  0 + STACK_0
+	STACK_4 <- *FSR0L
+	FSR0L <-  0 + STACK_0
+	STACK_2 <- *FSR0L
+	if ( STACK_4 != STACK_2) then goto L_SaveCellState_5
+//test18f97.c,105 :: 		if (number == 14)        //особые условия для 14 ячейки
+	if ( FARG_SaveCellState+0 != 14) then goto L_SaveCellState_6
+//test18f97.c,107 :: 		cellState[number][0] = rxBuf[1];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	FSR1L <-  0 + STACK_0
+	*FSR1L <- _rxBuf+1
+//test18f97.c,108 :: 		cellState[number][1] = rxBuf[2];  //боковая крышка, если равно 2, то теряется связь со стойкой. если равно 0, то на мнемосхеме открыта, если равна 1, то в логе открыта
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 1
+	*FSR1L <- _rxBuf+2
+//test18f97.c,110 :: 		if (rxBuf[3] == '1')              //концевик двери , если 1, то верхняя крышка открыта в логе, если 0, то на мнемосхеме открыта
+	if ( _rxBuf+3 != 49) then goto L_SaveCellState_7
+//test18f97.c,111 :: 		cellState[number][2] =  '0';
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 2
+	*FSR1L <- 48
+	goto	L_SaveCellState_8
+L_SaveCellState_7:
+//test18f97.c,114 :: 		if (rxBuf[3] == '0')
+	if ( _rxBuf+3 != 48) then goto L_SaveCellState_9
+//test18f97.c,115 :: 		cellState[number][2] =  '1';
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 2
+	*FSR1L <- 49
+	goto	L_SaveCellState_10
+L_SaveCellState_9:
+//test18f97.c,117 :: 		cellState[number][2] = rxBuf[3];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 2
+	*FSR1L <- _rxBuf+3
+L_SaveCellState_10:
+//test18f97.c,118 :: 		}
+L_SaveCellState_8:
+//test18f97.c,121 :: 		cellState[number][3] = rxBuf[4];    //мастер ключ
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 3
+	*FSR1L <- _rxBuf+4
+//test18f97.c,122 :: 		cellState[number][4] = rxBuf[5];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 4
+	*FSR1L <- _rxBuf+5
+//test18f97.c,123 :: 		}
+	goto	L_SaveCellState_11
+L_SaveCellState_6:
+//test18f97.c,126 :: 		cellState[number][0] = rxBuf[1];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	FSR1L <-  0 + STACK_0
+	*FSR1L <- _rxBuf+1
+//test18f97.c,127 :: 		if(rxBuf[2]=='0')            //инверсия, если получен '0' и '1' // 20200929 - перепутали NO/NC у микрика B1. Приходится исправлять программно
+	if ( _rxBuf+2 != 48) then goto L_SaveCellState_12
+//test18f97.c,128 :: 		{cellState[number][1] = '1';}
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 1
+	*FSR1L <- 49
+	goto	L_SaveCellState_13
+L_SaveCellState_12:
+//test18f97.c,131 :: 		if(rxBuf[2]=='1')
+	if ( _rxBuf+2 != 49) then goto L_SaveCellState_14
+//test18f97.c,132 :: 		{cellState[number][1] = '0';}
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 1
+	*FSR1L <- 48
+	goto	L_SaveCellState_15
+L_SaveCellState_14:
+//test18f97.c,134 :: 		{cellState[number][1] = rxBuf[2];} //если получена '2', то оставляем
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 1
+	*FSR1L <- _rxBuf+2
+L_SaveCellState_15:
+//test18f97.c,135 :: 		}
+L_SaveCellState_13:
+//test18f97.c,136 :: 		cellState[number][2] = rxBuf[3];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 2
+	*FSR1L <- _rxBuf+3
+//test18f97.c,137 :: 		cellState[number][3] = rxBuf[4];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 3
+	*FSR1L <- _rxBuf+4
+//test18f97.c,138 :: 		cellState[number][4] = rxBuf[5];
+	STACK_0 <-  5 * FARG_SaveCellState+0
+	STACK_0 <-  0 + STACK_0
+	FSR1L <-  STACK_0 + 4
+	*FSR1L <- _rxBuf+5
+//test18f97.c,139 :: 		}
+L_SaveCellState_11:
+//test18f97.c,140 :: 		}
+L_SaveCellState_5:
+//test18f97.c,141 :: 		chkSum2[number] = chkSum1[number];
+	STACK_0 <-  2 * FARG_SaveCellState+0
+	FSR1L <-  0 + STACK_0
+	FSR0L <-  0 + STACK_0
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+  end
+
+_WriteChangesLog:
+  begin
+//test18f97.c,149 :: 		if(cell>14) {return;}
+	if ( FARG_WriteChangesLog+0 <= 14) then goto L_WriteChangesLog_16
+	return
+L_WriteChangesLog_16:
+//test18f97.c,155 :: 		(prevCellState[cell][4]!=cellState[cell][4]))  {
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	FSR0L <-  0 + STACK_0
+	STACK_4 <- *FSR0L
+	FSR0L <-  0 + STACK_0
+	STACK_2 <- *FSR0L
+	if ( STACK_4 != STACK_2) then goto L286_ex_L_WriteChangesLog_19
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR0L <-  STACK_2 + 1
+	STACK_4 <- *FSR0L
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	STACK_2 <- *FSR0L
+	if ( STACK_4 != STACK_2) then goto L286_ex_L_WriteChangesLog_19
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR0L <-  STACK_2 + 2
+	STACK_4 <- *FSR0L
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	STACK_2 <- *FSR0L
+	if ( STACK_4 != STACK_2) then goto L286_ex_L_WriteChangesLog_19
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR0L <-  STACK_2 + 3
+	STACK_4 <- *FSR0L
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	STACK_2 <- *FSR0L
+	if ( STACK_4 != STACK_2) then goto L286_ex_L_WriteChangesLog_19
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR0L <-  STACK_2 + 4
+	STACK_4 <- *FSR0L
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_2 <- *FSR0L
+	if ( STACK_4 = STACK_2) then goto L_WriteChangesLog_19
+L286_ex_L_WriteChangesLog_19:
+//test18f97.c,157 :: 		if(cellState[cell][4]!='8') {
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_2 <- *FSR0L
+	if ( STACK_2 = 56) then goto L_WriteChangesLog_20
+//test18f97.c,158 :: 		tmpBuf[0] = '_';                                 // в этом чертовом microC нестабильно работает sprintf();
+	WriteChangesLog_tmpBuf_L0 <- 95
+//test18f97.c,159 :: 		tmpBuf[1] = '_';
+	WriteChangesLog_tmpBuf_L0+1 <- 95
+//test18f97.c,160 :: 		tmpBuf[2] = 'c';
+	WriteChangesLog_tmpBuf_L0+2 <- 99
+//test18f97.c,161 :: 		tmpBuf[3] = 'e';
+	WriteChangesLog_tmpBuf_L0+3 <- 101
+//test18f97.c,162 :: 		tmpBuf[4] = 'l';
+	WriteChangesLog_tmpBuf_L0+4 <- 108
+//test18f97.c,163 :: 		tmpBuf[5] = 'l';
+	WriteChangesLog_tmpBuf_L0+5 <- 108
+//test18f97.c,164 :: 		tmpBuf[6] = '_';
+	WriteChangesLog_tmpBuf_L0+6 <- 95
+//test18f97.c,165 :: 		tmpBuf[7] = '0'+(cell/10);
+	STACK_0 <-  FARG_WriteChangesLog+0 / 10
+	WriteChangesLog_tmpBuf_L0+7 <-  48 + STACK_0  [Optimized To Dest]
+	WriteChangesLog_tmpBuf_L0+7 <- WriteChangesLog_tmpBuf_L0+7
+//test18f97.c,166 :: 		tmpBuf[8] = '0'+(cell%10);
+	STACK_0 <-  FARG_WriteChangesLog+0 mod 10
+	WriteChangesLog_tmpBuf_L0+8 <-  48 + STACK_0  [Optimized To Dest]
+	WriteChangesLog_tmpBuf_L0+8 <- WriteChangesLog_tmpBuf_L0+8
+//test18f97.c,167 :: 		tmpBuf[9] = '=';
+	WriteChangesLog_tmpBuf_L0+9 <- 61
+//test18f97.c,169 :: 		if((cellState[cell][0]>='0')&&(cellState[cell][0]<'5')) { tmpBuf[10] = cellState[cell][0];}
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	FSR0L <-  0 + STACK_0
+	STACK_2 <- *FSR0L
+	if ( STACK_2 < 48) then goto L_WriteChangesLog_23
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	FSR0L <-  0 + STACK_0
+	STACK_2 <- *FSR0L
+	if ( STACK_2 >= 53) then goto L_WriteChangesLog_23
+L323_ex_L_WriteChangesLog_23:
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	FSR0L <-  0 + STACK_0
+	WriteChangesLog_tmpBuf_L0+10 <- *FSR0L
+	WriteChangesLog_tmpBuf_L0+10 <- WriteChangesLog_tmpBuf_L0+10
+	goto	L_WriteChangesLog_24
+L_WriteChangesLog_23:
+//test18f97.c,170 :: 		else {tmpBuf[10] = '5';}
+	WriteChangesLog_tmpBuf_L0+10 <- 53
+L_WriteChangesLog_24:
+//test18f97.c,171 :: 		tmpBuf[11] =  ',';
+	WriteChangesLog_tmpBuf_L0+11 <- 44
+//test18f97.c,172 :: 		if((cellState[cell][1]>='0')&&(cellState[cell][1]<'5')) { tmpBuf[12] = cellState[cell][1];}
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	STACK_2 <- *FSR0L
+	if ( STACK_2 < 48) then goto L_WriteChangesLog_27
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	STACK_2 <- *FSR0L
+	if ( STACK_2 >= 53) then goto L_WriteChangesLog_27
+L351_ex_L_WriteChangesLog_27:
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	WriteChangesLog_tmpBuf_L0+12 <- *FSR0L
+	WriteChangesLog_tmpBuf_L0+12 <- WriteChangesLog_tmpBuf_L0+12
+	goto	L_WriteChangesLog_28
+L_WriteChangesLog_27:
+//test18f97.c,173 :: 		else {tmpBuf[12] = '5';}
+	WriteChangesLog_tmpBuf_L0+12 <- 53
+L_WriteChangesLog_28:
+//test18f97.c,174 :: 		tmpBuf[13] =  ',';
+	WriteChangesLog_tmpBuf_L0+13 <- 44
+//test18f97.c,175 :: 		if((cellState[cell][2]>='0')&&(cellState[cell][2]<'5')) { tmpBuf[14] = cellState[cell][2];}
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	STACK_2 <- *FSR0L
+	if ( STACK_2 < 48) then goto L_WriteChangesLog_31
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	STACK_2 <- *FSR0L
+	if ( STACK_2 >= 53) then goto L_WriteChangesLog_31
+L380_ex_L_WriteChangesLog_31:
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	WriteChangesLog_tmpBuf_L0+14 <- *FSR0L
+	WriteChangesLog_tmpBuf_L0+14 <- WriteChangesLog_tmpBuf_L0+14
+	goto	L_WriteChangesLog_32
+L_WriteChangesLog_31:
+//test18f97.c,176 :: 		else {tmpBuf[14] = '5';}
+	WriteChangesLog_tmpBuf_L0+14 <- 53
+L_WriteChangesLog_32:
+//test18f97.c,177 :: 		tmpBuf[15] =  ',';
+	WriteChangesLog_tmpBuf_L0+15 <- 44
+//test18f97.c,178 :: 		if((cellState[cell][3]>='0')&&(cellState[cell][3]<'5')) { tmpBuf[16] = cellState[cell][3];}
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	STACK_2 <- *FSR0L
+	if ( STACK_2 < 48) then goto L_WriteChangesLog_35
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	STACK_2 <- *FSR0L
+	if ( STACK_2 >= 53) then goto L_WriteChangesLog_35
+L409_ex_L_WriteChangesLog_35:
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	WriteChangesLog_tmpBuf_L0+16 <- *FSR0L
+	WriteChangesLog_tmpBuf_L0+16 <- WriteChangesLog_tmpBuf_L0+16
+	goto	L_WriteChangesLog_36
+L_WriteChangesLog_35:
+//test18f97.c,179 :: 		else {tmpBuf[16] = '5';}
+	WriteChangesLog_tmpBuf_L0+16 <- 53
+L_WriteChangesLog_36:
+//test18f97.c,180 :: 		tmpBuf[17] =  ',';
+	WriteChangesLog_tmpBuf_L0+17 <- 44
+//test18f97.c,181 :: 		if((cellState[cell][4]>='0')&&(cellState[cell][4]<'5')) { tmpBuf[18] = cellState[cell][4];}
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_2 <- *FSR0L
+	if ( STACK_2 < 48) then goto L_WriteChangesLog_39
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_2 <- *FSR0L
+	if ( STACK_2 >= 53) then goto L_WriteChangesLog_39
+L438_ex_L_WriteChangesLog_39:
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	WriteChangesLog_tmpBuf_L0+18 <- *FSR0L
+	WriteChangesLog_tmpBuf_L0+18 <- WriteChangesLog_tmpBuf_L0+18
+	goto	L_WriteChangesLog_40
+L_WriteChangesLog_39:
+//test18f97.c,182 :: 		else {tmpBuf[18] = '5';}
+	WriteChangesLog_tmpBuf_L0+18 <- 53
+L_WriteChangesLog_40:
+//test18f97.c,183 :: 		tmpBuf[19] =  0;
+	WriteChangesLog_tmpBuf_L0+19 <- 0
+//test18f97.c,185 :: 		log_write(PORT___,tmpBuf,0);                         // 20 байт
+	FARG_log_write+0 <- 4
+	FARG_log_write+1 <- 0
+	FARG_log_write+3 <- 0
+	CALL _log_write
+//test18f97.c,186 :: 		}
+L_WriteChangesLog_20:
+//test18f97.c,187 :: 		}
+L_WriteChangesLog_19:
+//test18f97.c,188 :: 		prevCellState[cell][0] = cellState[cell][0];            // сохраним для следующего раза
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	FSR1L <-  0 + STACK_0
+	FSR0L <-  0 + STACK_0
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+//test18f97.c,189 :: 		prevCellState[cell][1] = cellState[cell][1];
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR1L <-  STACK_2 + 1
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+//test18f97.c,190 :: 		prevCellState[cell][2] = cellState[cell][2];
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR1L <-  STACK_2 + 2
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+//test18f97.c,191 :: 		prevCellState[cell][3] = cellState[cell][3];
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR1L <-  STACK_2 + 3
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+//test18f97.c,192 :: 		prevCellState[cell][4] = cellState[cell][4];
+	STACK_0 <-  5 * FARG_WriteChangesLog+0
+	STACK_2 <-  0 + STACK_0
+	FSR1L <-  STACK_2 + 4
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+  end
+
+_main:
+  begin
+//test18f97.c,200 :: 		unsigned char tmp=0, cnt=0, cnt2=0, cnt3=0, cnt5=0, cnt6=0, cnt7=0;
+	main_tmp_L0 <- 0
+	main_cnt_L0 <- 0
+	main_cnt2_L0 <- 0
+	main_cnt3_L0 <- 0
+	main_cnt5_L0 <- 0
+	main_cnt6_L0 <- 0
+	main_cnt7_L0 <- 0
+//test18f97.c,203 :: 		InitPort();
+	CALL _InitPort
+//test18f97.c,204 :: 		InitBoard();
+	CALL _InitBoard
+//test18f97.c,205 :: 		MyInitUsart1_115200();
+	CALL _MyInitUsart1_115200
+//test18f97.c,206 :: 		Termo_measure();
+	CALL _Termo_measure
+//test18f97.c,208 :: 		Led_R=0;  // включить красный сд
+	PORTC <-  PORTC & -2
+//test18f97.c,209 :: 		asm CLRWDT;        // сброс сторожевого таймера
+	asm: CLRWDT
+//test18f97.c,211 :: 		Led_Y=0; delay_ms(100);
+	PORTC <-  PORTC & -3
+	asm: MOVLW	4
+	asm: MOVWF	STACK_12
+	asm: MOVLW	255
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_12,F
+	asm: GOTO	$+2
+	asm: GOTO	$+8
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: GOTO	$-9
+	asm: MOVLW	48
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	136
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,212 :: 		Led_Y=1; delay_ms(100);
+	PORTC <-  PORTC | 2
+	asm: MOVLW	4
+	asm: MOVWF	STACK_12
+	asm: MOVLW	255
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_12,F
+	asm: GOTO	$+2
+	asm: GOTO	$+8
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: GOTO	$-9
+	asm: MOVLW	48
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	136
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,213 :: 		Led_Y=0; delay_ms(100);
+	PORTC <-  PORTC & -3
+	asm: MOVLW	4
+	asm: MOVWF	STACK_12
+	asm: MOVLW	255
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_12,F
+	asm: GOTO	$+2
+	asm: GOTO	$+8
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: GOTO	$-9
+	asm: MOVLW	48
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	136
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,214 :: 		Led_Y=1; delay_ms(100);
+	PORTC <-  PORTC | 2
+	asm: MOVLW	4
+	asm: MOVWF	STACK_12
+	asm: MOVLW	255
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_12,F
+	asm: GOTO	$+2
+	asm: GOTO	$+8
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: GOTO	$-9
+	asm: MOVLW	48
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	136
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,215 :: 		Led_Y=0; delay_ms(100);
+	PORTC <-  PORTC & -3
+	asm: MOVLW	4
+	asm: MOVWF	STACK_12
+	asm: MOVLW	255
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_12,F
+	asm: GOTO	$+2
+	asm: GOTO	$+8
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: GOTO	$-9
+	asm: MOVLW	48
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	136
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,216 :: 		Led_Y=1; delay_ms(100);
+	PORTC <-  PORTC | 2
+	asm: MOVLW	4
+	asm: MOVWF	STACK_12
+	asm: MOVLW	255
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_12,F
+	asm: GOTO	$+2
+	asm: GOTO	$+8
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: GOTO	$-9
+	asm: MOVLW	48
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	136
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+//test18f97.c,218 :: 		cf_r_ptr = 0;
+	_cf_r_ptr <- 0
+//test18f97.c,219 :: 		file_number = 0;   // номер лог - файла на CF
+	_file_number <- 0
+//test18f97.c,220 :: 		flag_read_fat = 0;  // FAT в состоянии read =1, иначе 0
+	_flag_read_fat <- 0
+//test18f97.c,222 :: 		ip_get();                            // чтение IP из EEPROM  при включении питания или после перезапуска
+	CALL _ip_get
+//test18f97.c,223 :: 		log_write ( POWER, "", tmp );   // записать в журнал - включение
+	FARG_log_write+0 <- 1
+	FARG_log_write+1 <- 0
+	FARG_log_write+3 <- main_tmp_L0
+	CALL _log_write
+//test18f97.c,224 :: 		asm CLRWDT;
+	asm: CLRWDT
+//test18f97.c,225 :: 		if ( PORTJ.F1 == 0 ) {   // =0 - ON, =1 - OFF
+	STACK_2 <-  PORTJ & 2
+	STACK_0 <- 1
+	STACK_2 <-  STACK_2 shr STACK_0
+	if ( STACK_2 != 0) then goto L_main_41
+//test18f97.c,226 :: 		myIpAddr[0]  = 192;
+	_myIpAddr <- 192
+//test18f97.c,227 :: 		myIpAddr[1]  = 168;
+	_myIpAddr+1 <- 168
+//test18f97.c,228 :: 		myIpAddr[2]  = 1;
+	_myIpAddr+2 <- 1
+//test18f97.c,229 :: 		myIpAddr[3]  = 60;
+	_myIpAddr+3 <- 60
+//test18f97.c,230 :: 		Ethernet_Init(myMacAddr, myIpAddr, Ethernet_HALFDUPLEX) ;
+	FARG_Ethernet_Init+0 <- 0
+	FARG_Ethernet_Init+2 <- 0
+	FARG_Ethernet_Init+4 <- 0
+	CALL _Ethernet_Init
+//test18f97.c,231 :: 		Ethernet_confNetwork(ipMask, gwIpAddr, dnsIpAddr) ;
+	FARG_Ethernet_confNetwork+0 <- 0
+	FARG_Ethernet_confNetwork+2 <- 0
+	FARG_Ethernet_confNetwork+4 <- 0
+	CALL _Ethernet_confNetwork
+//test18f97.c,232 :: 		ip_new_flag = 1;          // - флаг запуска в режиме установки нового IP (=1)
+	_ip_new_flag <- 1
+//test18f97.c,233 :: 		ip_set();                 // установка нового IP и запись его в EEPROM
+	CALL _ip_set
+//test18f97.c,234 :: 		}
+L_main_41:
+//test18f97.c,236 :: 		ip_new_flag = 0;          // сброс  - флаг запуска в режиме установки нового IP (=1)
+	_ip_new_flag <- 0
+//test18f97.c,238 :: 		Ethernet_Init(myMacAddr, myIpAddr, Ethernet_HALFDUPLEX) ; //Ethernet_Init(myMacAddr, myIpAddr, Ethernet_FULLDUPLEX) ;
+	FARG_Ethernet_Init+0 <- 0
+	FARG_Ethernet_Init+2 <- 0
+	FARG_Ethernet_Init+4 <- 0
+	CALL _Ethernet_Init
+//test18f97.c,239 :: 		Ethernet_confNetwork(ipMask, gwIpAddr, dnsIpAddr) ; // dhcp will not be used here, so use preconfigured addresses
+	FARG_Ethernet_confNetwork+0 <- 0
+	FARG_Ethernet_confNetwork+2 <- 0
+	FARG_Ethernet_confNetwork+4 <- 0
+	CALL _Ethernet_confNetwork
+//test18f97.c,241 :: 		Led_R=1;  // выключить красный сд
+	PORTC <-  PORTC | 1
+//test18f97.c,243 :: 		while(1)                                      // do forever
+L_main_42:
+//test18f97.c,245 :: 		for(i=1;i<15;i++)
+	main_i_L0 <- 1
+L_main_44:
+	if ( main_i_L0 >= 15) then goto L_main_45
+//test18f97.c,247 :: 		asm CLRWDT;                               // сброс сторожевого таймера
+	asm: CLRWDT
+//test18f97.c,248 :: 		SendCommandToCell(i);                     // отправка команды ячейке номер i, т.е. включение или отключение соленоида
+	FARG_sendCommandToCell+0 <- main_i_L0
+	CALL _sendCommandToCell
+//test18f97.c,249 :: 		SetTimer100us(8);                         // установим таймер на 0.8мс
+	FARG_SetTimer100us+0 <- 8
+	CALL _SetTimer100us
+//test18f97.c,250 :: 		while(timer1Flag==0)                      // крутимся пока не закончится время, отведенное на прием с некоторым запасом, 0,8мс
+L_main_47:
+	if ( _timer1Flag != 0) then goto L_main_48
+//test18f97.c,252 :: 		Ethernet_doPacket() ;                   // process incoming Ethernet packets
+	CALL _Ethernet_doPacket
+//test18f97.c,253 :: 		}
+	goto	L_main_47
+L_main_48:
+//test18f97.c,254 :: 		SaveCellState(i);                         // смотрим на содержимое буфера и сохраняем состояние ячейки в масив если она ответила 2 раза одно и то же
+	FARG_SaveCellState+0 <- main_i_L0
+	CALL _SaveCellState
+//test18f97.c,255 :: 		WriteChangesLog(i);                       // запишем все изменения состояний ячеек если таковые имеются (сравним прошлое и текущее состояние)
+	FARG_WriteChangesLog+0 <- main_i_L0
+	CALL _WriteChangesLog
+//test18f97.c,256 :: 		}
+L_main_46:
+//test18f97.c,245 :: 		for(i=1;i<15;i++)
+	main_i_L0 <-  main_i_L0 + 1
+	main_i_L0 <- main_i_L0
+//test18f97.c,256 :: 		}
+	goto	L_main_44
+L_main_45:
+//test18f97.c,269 :: 		if((cellState[14][3] == '1')&&(cellState[14][4]!='8')) {    // если повернули мастер ключ (b3=1), начну разблокировать ячейки
+	if ( _cellState+73 != 49) then goto L_main_51
+	if ( _cellState+74 = 56) then goto L_main_51
+L729_ex_L_main_51:
+//test18f97.c,270 :: 		cnt6=0, cnt7=0;
+	main_cnt6_L0 <- 0
+	main_cnt7_L0 <- 0
+//test18f97.c,271 :: 		fMasterKey = 1;
+	_fMasterKey <- 1
+//test18f97.c,272 :: 		cnt2++;
+	main_cnt2_L0 <-  main_cnt2_L0 + 1
+	main_cnt2_L0 <- main_cnt2_L0
+//test18f97.c,273 :: 		if (cnt2>20)  {
+	if ( main_cnt2_L0 <= 20) then goto L_main_52
+//test18f97.c,274 :: 		cnt2=0;
+	main_cnt2_L0 <- 0
+//test18f97.c,275 :: 		if(cnt3<13) {
+	if ( main_cnt3_L0 >= 13) then goto L_main_53
+//test18f97.c,276 :: 		cnt3++;
+	main_cnt3_L0 <-  main_cnt3_L0 + 1
+	main_cnt3_L0 <- main_cnt3_L0
+//test18f97.c,277 :: 		cellCommand[cnt3] = 1;
+	FSR1L <-  0 + main_cnt3_L0
+	*FSR1L <- 1
+//test18f97.c,278 :: 		}
+L_main_53:
+//test18f97.c,279 :: 		if(cnt4<200) {cnt4++;}                  // если закончился тайм аут (1 минута), начну снова блокировать ячейки для экономии заряда аккумулятора
+	if ( main_cnt4_L0 >= 200) then goto L_main_54
+	main_cnt4_L0 <-  main_cnt4_L0 + 1
+	main_cnt4_L0 <- main_cnt4_L0
+	goto	L_main_55
+L_main_54:
+//test18f97.c,281 :: 		if(cnt5<13) {
+	if ( main_cnt5_L0 >= 13) then goto L_main_56
+//test18f97.c,282 :: 		cnt5++;
+	main_cnt5_L0 <-  main_cnt5_L0 + 1
+	main_cnt5_L0 <- main_cnt5_L0
+//test18f97.c,283 :: 		cellCommand[cnt5] = 0;
+	FSR1L <-  0 + main_cnt5_L0
+	*FSR1L <- 0
+//test18f97.c,284 :: 		}
+L_main_56:
+//test18f97.c,285 :: 		}
+L_main_55:
+//test18f97.c,286 :: 		}
+L_main_52:
+//test18f97.c,287 :: 		}
+	goto	L_main_57
+L_main_51:
+//test18f97.c,289 :: 		cnt2=cnt3=cnt4=cnt5=0;
+	main_cnt5_L0 <- 0
+	main_cnt4_L0 <- 0
+	main_cnt3_L0 <- 0
+	main_cnt2_L0 <- 0
+//test18f97.c,290 :: 		if(fMasterKey==1) {                       // но был только что установлен,
+	if ( _fMasterKey != 1) then goto L_main_58
+//test18f97.c,291 :: 		cnt7++;
+	main_cnt7_L0 <-  main_cnt7_L0 + 1
+	main_cnt7_L0 <- main_cnt7_L0
+//test18f97.c,292 :: 		if (cnt7>20)  {
+	if ( main_cnt7_L0 <= 20) then goto L_main_59
+//test18f97.c,293 :: 		cnt7=0;
+	main_cnt7_L0 <- 0
+//test18f97.c,294 :: 		if(cnt6<13) {
+	if ( main_cnt6_L0 >= 13) then goto L_main_60
+//test18f97.c,295 :: 		cnt6++;
+	main_cnt6_L0 <-  main_cnt6_L0 + 1
+	main_cnt6_L0 <- main_cnt6_L0
+//test18f97.c,296 :: 		cellCommand[cnt6] = 0;             // блокируем все ячейки
+	FSR1L <-  0 + main_cnt6_L0
+	*FSR1L <- 0
+//test18f97.c,297 :: 		}
+	goto	L_main_61
+L_main_60:
+//test18f97.c,298 :: 		else { fMasterKey = 0; }
+	_fMasterKey <- 0
+L_main_61:
+//test18f97.c,299 :: 		}
+L_main_59:
+//test18f97.c,300 :: 		}
+L_main_58:
+//test18f97.c,301 :: 		}
+L_main_57:
+//test18f97.c,303 :: 		cnt++;                                     // моргаем светодиодом
+	main_cnt_L0 <-  main_cnt_L0 + 1
+	main_cnt_L0 <- main_cnt_L0
+//test18f97.c,304 :: 		if(cnt>10) {
+	if ( main_cnt_L0 <= 10) then goto L_main_62
+//test18f97.c,305 :: 		Led_G = !Led_G;
+	STACK_0 <- !PORTC
+	PORTC <- setbit(STACK_0)
+//test18f97.c,306 :: 		cnt=0;
+	main_cnt_L0 <- 0
+//test18f97.c,307 :: 		}
+L_main_62:
+//test18f97.c,308 :: 		}
+	goto	L_main_42
+  end
+
+GlobalInitest18f97:
+  begin
+  end
+

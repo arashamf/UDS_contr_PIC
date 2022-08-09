@@ -1,0 +1,498 @@
+_log_write:
+  begin
+//log.c,55 :: 		Led_R=0;  // включить красный сд
+	PORTC <-  PORTC & -2
+//log.c,56 :: 		flag_read_fat = 0;  // FAT в состо€нии read =1, иначе 0
+	_flag_read_fat <- 0
+//log.c,58 :: 		tmp =Set_fnum();  // обновление номера файла журнала =0-err, =1-файл пуст, =2-год соответствует текущему, =3-прошлогодний
+	CALL _Set_fnum
+	log_write_tmp_L0 <- STACK_0
+//log.c,59 :: 		if ( tmp == 0 ) {Led_R=1; return 0; } // =0-err  Set_fnum
+	if ( STACK_0 != 0) then goto L_log_write_0
+	PORTC <-  PORTC | 1
+	STACK_0 <- 0
+	return
+L_log_write_0:
+//log.c,60 :: 		regim = tmp;
+	FARG_log_write+3 <- log_write_tmp_L0
+//log.c,62 :: 		if ( (type < 1) || (type > 6) )  {Led_R=1;  return 0;} //"type_err=" // проверка допустимых типов записей
+	if ( FARG_log_write+0 < 1) then goto L21_ex_L_log_write_3
+	if ( FARG_log_write+0 <= 6) then goto L_log_write_3
+L21_ex_L_log_write_3:
+	PORTC <-  PORTC | 1
+	STACK_0 <- 0
+	return
+L_log_write_3:
+//log.c,65 :: 		Get_Ip_Time();
+	CALL _Get_Ip_Time
+//log.c,66 :: 		tmp =  Cf_Fat_Init(&PORTH,&PORTE);
+	FARG_Cf_Fat_Init+0 <- 0
+	FARG_Cf_Fat_Init+2 <- 0
+	CALL _Cf_Fat_Init
+	log_write_tmp_L0 <- STACK_0
+//log.c,67 :: 		if ( tmp != 0) {Led_R=1;  return 0;} //"init_err="
+	if ( STACK_0 = 0) then goto L_log_write_4
+	PORTC <-  PORTC | 1
+	STACK_0 <- 0
+	return
+L_log_write_4:
+//log.c,69 :: 		IntToStr(file_number, NUM_TXT) ;
+	FARG_IntToStr+0 <- _file_number
+	FARG_IntToStr+2 <- 0
+	CALL _IntToStr
+//log.c,70 :: 		if (NUM_TXT[3]==' ')  NUM_TXT[3] = '0';
+	if ( log_write_NUM_TXT_L0+3 != 32) then goto L_log_write_5
+	log_write_NUM_TXT_L0+3 <- 48
+L_log_write_5:
+//log.c,71 :: 		if (NUM_TXT[4]==' ')  NUM_TXT[4] = '0';
+	if ( log_write_NUM_TXT_L0+4 != 32) then goto L_log_write_6
+	log_write_NUM_TXT_L0+4 <- 48
+L_log_write_6:
+//log.c,72 :: 		LOG_TXT[5] = NUM_TXT[3];
+	log_write_LOG_TXT_L0+5 <- log_write_NUM_TXT_L0+3
+//log.c,73 :: 		LOG_TXT[6] = NUM_TXT[4];
+	log_write_LOG_TXT_L0+6 <- log_write_NUM_TXT_L0+4
+//log.c,74 :: 		LOG_TXT[7] = NUM_TXT[5];
+	log_write_LOG_TXT_L0+7 <- log_write_NUM_TXT_L0+5
+//log.c,75 :: 		tmp = Cf_Fat_Assign(LOG_TXT,0xA0);
+	FARG_Cf_Fat_Assign+0 <- 0
+	FARG_Cf_Fat_Assign+2 <- 160
+	CALL _Cf_Fat_Assign
+	log_write_tmp_L0 <- STACK_0
+//log.c,76 :: 		if ( tmp != 1) {Led_R=1; return 0;} //"ass_err="
+	if ( STACK_0 = 1) then goto L_log_write_7
+	PORTC <-  PORTC | 1
+	STACK_0 <- 0
+	return
+L_log_write_7:
+//log.c,78 :: 		if( (regim==1) || (regim==2) )  Cf_Fat_Append();
+	if ( FARG_log_write+3 = 1) then goto L71_ex_L_log_write_10
+	if ( FARG_log_write+3 != 2) then goto L_log_write_10
+L71_ex_L_log_write_10:
+	CALL _Cf_Fat_Append
+	goto	L_log_write_11
+L_log_write_10:
+//log.c,79 :: 		else                            Cf_Fat_Rewrite();
+	CALL _Cf_Fat_Rewrite
+L_log_write_11:
+//log.c,82 :: 		if ( type == POWER )  {
+	if ( FARG_log_write+0 != 1) then goto L_log_write_12
+//log.c,83 :: 		strncat (dyna2, ip_string, 16);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 16
+	CALL _strncat
+//log.c,84 :: 		strncat (dyna2, date_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,85 :: 		strncat (dyna2, time_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,87 :: 		strncat (dyna2," power_on_____________________________________________________________________________________", 92);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 92
+	CALL _strncat
+//log.c,88 :: 		strncat (dyna2,"\r\n", 2);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 2
+	CALL _strncat
+//log.c,89 :: 		Cf_Fat_Write (dyna2, 128);
+	FARG_Cf_Fat_Write+0 <- 0
+	FARG_Cf_Fat_Write+2 <- 128
+	CALL _Cf_Fat_Write
+//log.c,90 :: 		}
+	goto	L_log_write_13
+L_log_write_12:
+//log.c,91 :: 		else if ( type == COMMAND ) {
+	if ( FARG_log_write+0 != 2) then goto L_log_write_14
+//log.c,92 :: 		strncat (dyna2, ip_string, 16);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 16
+	CALL _strncat
+//log.c,93 :: 		strncat (dyna2, date_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,94 :: 		strncat (dyna2, time_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,96 :: 		strncat (dyna2," command", 8);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 8
+	CALL _strncat
+//log.c,97 :: 		strncat (dyna2,inf, 84);    //
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- FARG_log_write+1
+	FARG_strncat+4 <- 84
+	CALL _strncat
+//log.c,98 :: 		strncat (dyna2,"\r\n", 2);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 2
+	CALL _strncat
+//log.c,99 :: 		Cf_Fat_Write (dyna2, 128);
+	FARG_Cf_Fat_Write+0 <- 0
+	FARG_Cf_Fat_Write+2 <- 128
+	CALL _Cf_Fat_Write
+//log.c,100 :: 		}
+	goto	L_log_write_15
+L_log_write_14:
+//log.c,101 :: 		else if ( type == CMD )  {
+	if ( FARG_log_write+0 != 3) then goto L_log_write_16
+//log.c,102 :: 		strncat (dyna2, ip_string, 16);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 16
+	CALL _strncat
+//log.c,103 :: 		strncat (dyna2, date_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,104 :: 		strncat (dyna2, time_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,106 :: 		strncat (dyna2,"     cmd", 8);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 8
+	CALL _strncat
+//log.c,107 :: 		strncat (dyna2,inf, 28);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- FARG_log_write+1
+	FARG_strncat+4 <- 28
+	CALL _strncat
+//log.c,108 :: 		strncat (dyna2,"                                                        ", 56);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 56
+	CALL _strncat
+//log.c,109 :: 		strncat (dyna2,"\r\n", 2);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 2
+	CALL _strncat
+//log.c,110 :: 		Cf_Fat_Write (dyna2, 128);
+	FARG_Cf_Fat_Write+0 <- 0
+	FARG_Cf_Fat_Write+2 <- 128
+	CALL _Cf_Fat_Write
+//log.c,111 :: 		}
+	goto	L_log_write_17
+L_log_write_16:
+//log.c,113 :: 		else if ( type == IP )  {
+	if ( FARG_log_write+0 != 5) then goto L_log_write_18
+//log.c,114 :: 		strncat (dyna2, ip_string, 16);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 16
+	CALL _strncat
+//log.c,115 :: 		strncat (dyna2, date_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,116 :: 		strncat (dyna2, time_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,118 :: 		strncat (dyna2,"      ip", 8);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 8
+	CALL _strncat
+//log.c,119 :: 		strncat (dyna2,inf, 28);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- FARG_log_write+1
+	FARG_strncat+4 <- 28
+	CALL _strncat
+//log.c,120 :: 		strncat (dyna2,"                                                        ", 56);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 56
+	CALL _strncat
+//log.c,121 :: 		strncat (dyna2,"\r\n", 2);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 2
+	CALL _strncat
+//log.c,122 :: 		Cf_Fat_Write (dyna2, 128);
+	FARG_Cf_Fat_Write+0 <- 0
+	FARG_Cf_Fat_Write+2 <- 128
+	CALL _Cf_Fat_Write
+//log.c,123 :: 		}
+	goto	L_log_write_19
+L_log_write_18:
+//log.c,124 :: 		else if ( type == PORT___ )  {
+	if ( FARG_log_write+0 != 4) then goto L_log_write_20
+//log.c,125 :: 		strncat (dyna2, ip_string, 16);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 16
+	CALL _strncat
+//log.c,126 :: 		strncat (dyna2, date_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,127 :: 		strncat (dyna2, time_string, 9);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 9
+	CALL _strncat
+//log.c,128 :: 		strncat (dyna2, inf, 20);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- FARG_log_write+1
+	FARG_strncat+4 <- 20
+	CALL _strncat
+//log.c,129 :: 		strncat (dyna2,"                                                                         \r\n", 75);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 75
+	CALL _strncat
+//log.c,130 :: 		Cf_Fat_Write (dyna2, 128);
+	FARG_Cf_Fat_Write+0 <- 0
+	FARG_Cf_Fat_Write+2 <- 128
+	CALL _Cf_Fat_Write
+//log.c,131 :: 		}
+L_log_write_20:
+L_log_write_19:
+L_log_write_17:
+L_log_write_15:
+L_log_write_13:
+//log.c,133 :: 		Led_R=1;  // выключить красный сд
+	PORTC <-  PORTC | 1
+//log.c,134 :: 		return 1;
+	STACK_0 <- 1
+	return
+  end
+
+_l_w_port3:
+  begin
+//log.c,141 :: 		dyna[0] = ' ';
+	_dyna <- 32
+//log.c,142 :: 		ByteToStr(cmd_port_num, tmp) ;
+	FARG_ByteToStr+0 <- FARG_l_w_port3+0
+	FARG_ByteToStr+1 <- 0
+	CALL _ByteToStr
+//log.c,143 :: 		dyna[1] = tmp[1];
+	_dyna+1 <- l_w_port3_tmp_L0+1
+//log.c,144 :: 		dyna[2] = tmp[2];
+	_dyna+2 <- l_w_port3_tmp_L0+2
+//log.c,145 :: 		dyna[3] = ' ';
+	_dyna+3 <- 32
+//log.c,146 :: 		ByteToStr(cf_line_state[cmd_port_num], tmp) ;
+	FSR0L <-  0 + FARG_l_w_port3+0
+	FARG_ByteToStr+0 <- *FSR0L
+	FARG_ByteToStr+0 <- FARG_ByteToStr+0
+	FARG_ByteToStr+1 <- 0
+	CALL _ByteToStr
+//log.c,147 :: 		dyna[4] = tmp[0];
+	_dyna+4 <- l_w_port3_tmp_L0
+//log.c,148 :: 		dyna[5] = tmp[1];
+	_dyna+5 <- l_w_port3_tmp_L0+1
+//log.c,149 :: 		dyna[6] = tmp[2];
+	_dyna+6 <- l_w_port3_tmp_L0+2
+//log.c,150 :: 		ByteToStr(cf_port_state[cmd_port_num], tmp) ;
+	FSR0L <-  0 + FARG_l_w_port3+0
+	FARG_ByteToStr+0 <- *FSR0L
+	FARG_ByteToStr+0 <- FARG_ByteToStr+0
+	FARG_ByteToStr+1 <- 0
+	CALL _ByteToStr
+//log.c,151 :: 		dyna[7] = ' ';
+	_dyna+7 <- 32
+//log.c,152 :: 		dyna[8] = tmp[0];
+	_dyna+8 <- l_w_port3_tmp_L0
+//log.c,153 :: 		dyna[9] = tmp[1];
+	_dyna+9 <- l_w_port3_tmp_L0+1
+//log.c,154 :: 		dyna[10] = tmp[2];
+	_dyna+10 <- l_w_port3_tmp_L0+2
+//log.c,155 :: 		ByteToStr(cf_door_state[cmd_port_num], tmp) ;
+	FSR0L <-  0 + FARG_l_w_port3+0
+	FARG_ByteToStr+0 <- *FSR0L
+	FARG_ByteToStr+0 <- FARG_ByteToStr+0
+	FARG_ByteToStr+1 <- 0
+	CALL _ByteToStr
+//log.c,156 :: 		dyna[11] = ' ';
+	_dyna+11 <- 32
+//log.c,157 :: 		dyna[12] = tmp[0];
+	_dyna+12 <- l_w_port3_tmp_L0
+//log.c,158 :: 		dyna[13] = tmp[1];
+	_dyna+13 <- l_w_port3_tmp_L0+1
+//log.c,159 :: 		dyna[14] = tmp[2];
+	_dyna+14 <- l_w_port3_tmp_L0+2
+//log.c,160 :: 		dyna[15] = '\0';
+	_dyna+15 <- 0
+  end
+
+_Num_to_0str:
+  begin
+//log.c,167 :: 		ByteToStr(num, p_str) ;
+	FARG_ByteToStr+0 <- FARG_Num_to_0str+0
+	FARG_ByteToStr+1 <- FARG_Num_to_0str+1
+	CALL _ByteToStr
+//log.c,168 :: 		if (*p_str == ' ') *p_str = '0';
+	STACK_1 <- *FARG_Num_to_0str+1
+	if ( STACK_1 != 32) then goto L_Num_to_0str_21
+	*FARG_Num_to_0str+1 <- 48
+L_Num_to_0str_21:
+//log.c,169 :: 		if (*(p_str+1) == ' ') *(p_str+1) = '0';
+	FSR0L <-  FARG_Num_to_0str+1 + 1
+	STACK_1 <- *FSR0L
+	if ( STACK_1 != 32) then goto L_Num_to_0str_22
+	FSR1L <-  FARG_Num_to_0str+1 + 1
+	*FSR1L <- 48
+L_Num_to_0str_22:
+  end
+
+_Get_Ip_Time:
+  begin
+//log.c,178 :: 		Read_Time();      // read time from RTC
+	CALL _Read_Time
+//log.c,180 :: 		ip_string[0] = 0;
+	_ip_string <- 0
+//log.c,181 :: 		Num_to_0str(myIpAddr[0],tmp_string);
+	FARG_Num_to_0str+0 <- _myIpAddr
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,182 :: 		strncat (ip_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,183 :: 		strncat (ip_string, ".", 1);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 1
+	CALL _strncat
+//log.c,185 :: 		Num_to_0str(myIpAddr[1],tmp_string);
+	FARG_Num_to_0str+0 <- _myIpAddr+1
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,186 :: 		strncat (ip_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,187 :: 		strncat (ip_string, ".", 1);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 1
+	CALL _strncat
+//log.c,189 :: 		Num_to_0str(myIpAddr[2],tmp_string);
+	FARG_Num_to_0str+0 <- _myIpAddr+2
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,190 :: 		strncat (ip_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,191 :: 		strncat (ip_string, ".", 1);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 1
+	CALL _strncat
+//log.c,193 :: 		Num_to_0str(myIpAddr[3],tmp_string);
+	FARG_Num_to_0str+0 <- _myIpAddr+3
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,194 :: 		strncat (ip_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,195 :: 		strncat (ip_string, " ", 1);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 1
+	CALL _strncat
+//log.c,197 :: 		date_string[0] = 0;
+	_date_string <- 0
+//log.c,198 :: 		Num_to_0str(date,tmp_string);
+	FARG_Num_to_0str+0 <- _date
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,199 :: 		strncat (date_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,200 :: 		date_string[0] =  ' ' ;
+	_date_string <- 32
+//log.c,202 :: 		Num_to_0str(month,tmp_string);
+	FARG_Num_to_0str+0 <- _month
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,203 :: 		strncat (date_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,204 :: 		date_string[3] =  '/' ;
+	_date_string+3 <- 47
+//log.c,206 :: 		Num_to_0str(year,tmp_string);
+	FARG_Num_to_0str+0 <- _year
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,207 :: 		strncat (date_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,208 :: 		date_string[6] =  '/' ;
+	_date_string+6 <- 47
+//log.c,210 :: 		time_string[0] = 0;
+	_time_string <- 0
+//log.c,211 :: 		Num_to_0str(hour,tmp_string);
+	FARG_Num_to_0str+0 <- _hour
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,212 :: 		strncat (time_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,213 :: 		time_string[0] =  ' ' ;
+	_time_string <- 32
+//log.c,215 :: 		Num_to_0str(minute,tmp_string);
+	FARG_Num_to_0str+0 <- _minute
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,216 :: 		strncat (time_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,217 :: 		time_string[3] = ':' ;
+	_time_string+3 <- 58
+//log.c,219 :: 		Num_to_0str(second,tmp_string);
+	FARG_Num_to_0str+0 <- _second
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//log.c,220 :: 		strncat (time_string, tmp_string, 3);
+	FARG_strncat+0 <- 0
+	FARG_strncat+2 <- 0
+	FARG_strncat+4 <- 3
+	CALL _strncat
+//log.c,221 :: 		time_string[6] =  ':' ;
+	_time_string+6 <- 58
+  end
+
+GlobalInilog:
+  begin
+  end
+

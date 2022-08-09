@@ -1,0 +1,250 @@
+_MyInitUsart1_115200:
+  begin
+//USART.c,14 :: 		TRISC.F7=1;
+	TRISC <-  TRISC | 128
+//USART.c,15 :: 		TRISC.F6=0;
+	TRISC <-  TRISC & -65
+//USART.c,17 :: 		TXSTA1.TXEN = 1;
+	TXSTA1 <-  TXSTA1 | 32
+//USART.c,18 :: 		TXSTA1.SYNC = 0;
+	TXSTA1 <-  TXSTA1 & -17
+//USART.c,19 :: 		TXSTA1.BRGH = 1;
+	TXSTA1 <-  TXSTA1 | 4
+//USART.c,20 :: 		RCSTA1.SPEN=1;
+	RCSTA1 <-  RCSTA1 | 128
+//USART.c,21 :: 		RCSTA1.CREN=1;
+	RCSTA1 <-  RCSTA1 | 16
+//USART.c,22 :: 		BAUDCON1.BRG16 = 1;
+	BAUDCON1 <-  BAUDCON1 | 8
+//USART.c,23 :: 		SPBRGH1 = 0;
+	SPBRGH1 <- 0
+//USART.c,24 :: 		SPBRG1 = 53;
+	SPBRG1 <- 53
+//USART.c,26 :: 		PIR1.RC1IF = 0;
+	PIR1 <-  PIR1 & -33
+//USART.c,27 :: 		IPR1.RC1IP = 0;
+	IPR1 <-  IPR1 & -33
+//USART.c,28 :: 		PIE1.RC1IE = 1;
+	PIE1 <-  PIE1 | 32
+//USART.c,30 :: 		INTCON.GIE = 1;
+	INTCON <-  INTCON | 128
+//USART.c,31 :: 		INTCON.PEIE = 1;
+	INTCON <-  INTCON | 64
+  end
+
+_MyUsartRead1:
+  begin
+//USART.c,38 :: 		while(PIR1.RC1IF==0);
+L_MyUsartRead1_0:
+	STACK_1 <-  PIR1 & 32
+	STACK_0 <- 5
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 = 0) then goto L_MyUsartRead1_0
+L_MyUsartRead1_1:
+//USART.c,40 :: 		RCSTA1.CREN=0;
+	RCSTA1 <-  RCSTA1 & -17
+//USART.c,41 :: 		return tmp;
+	STACK_0 <- RCREG1
+	return
+  end
+
+_MyUsartWrite1:
+  begin
+//USART.c,47 :: 		while(TXSTA1.TRMT==0);   // ждем пока не освободится
+L_MyUsartWrite1_2:
+	STACK_1 <-  TXSTA1 & 2
+	STACK_0 <- 1
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 = 0) then goto L_MyUsartWrite1_2
+L_MyUsartWrite1_3:
+//USART.c,48 :: 		TXREG1 = x;              // отправляем байт
+	TXREG1 <- FARG_MyUsartWrite1+0
+  end
+
+_SendCommandToCell:
+  begin
+//USART.c,55 :: 		SET_RS485_OUT;
+	PORTB <-  PORTB | 64
+	PORTB <-  PORTB | 128
+//USART.c,56 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,57 :: 		delay_us(10);
+	asm: MOVLW	20
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//USART.c,58 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,59 :: 		while(TXSTA1.TRMT==0)
+L_SendCommandToCell_4:
+	STACK_1 <-  TXSTA1 & 2
+	STACK_0 <- 1
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 != 0) then goto L_SendCommandToCell_5
+//USART.c,61 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,62 :: 		}
+	goto	L_SendCommandToCell_4
+L_SendCommandToCell_5:
+//USART.c,63 :: 		TXREG1 = 0x02;                             //  байт №1  - признак начала пакета
+	TXREG1 <- 2
+//USART.c,64 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,65 :: 		while(TXSTA1.TRMT==0)
+L_SendCommandToCell_6:
+	STACK_1 <-  TXSTA1 & 2
+	STACK_0 <- 1
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 != 0) then goto L_SendCommandToCell_7
+//USART.c,67 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,68 :: 		}
+	goto	L_SendCommandToCell_6
+L_SendCommandToCell_7:
+//USART.c,69 :: 		TXREG1 = 0x30+number/10;                   //  байт №2   - десятки от номера ячейки (dec)
+	STACK_0 <-  FARG_SendCommandToCell+0 / 10
+	TXREG1 <-  48 + STACK_0  [Optimized To Dest]
+	TXREG1 <- TXREG1
+//USART.c,70 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,71 :: 		while(TXSTA1.TRMT==0)
+L_SendCommandToCell_8:
+	STACK_1 <-  TXSTA1 & 2
+	STACK_0 <- 1
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 != 0) then goto L_SendCommandToCell_9
+//USART.c,73 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,74 :: 		}
+	goto	L_SendCommandToCell_8
+L_SendCommandToCell_9:
+//USART.c,75 :: 		TXREG1 = 0x30+number%10;                   //  байт №3   - единицы номера (dec)
+	STACK_0 <-  FARG_SendCommandToCell+0 mod 10
+	TXREG1 <-  48 + STACK_0  [Optimized To Dest]
+	TXREG1 <- TXREG1
+//USART.c,76 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,77 :: 		while(TXSTA1.TRMT==0)
+L_SendCommandToCell_10:
+	STACK_1 <-  TXSTA1 & 2
+	STACK_0 <- 1
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 != 0) then goto L_SendCommandToCell_11
+//USART.c,79 :: 		Ethernet_doPacket();
+	CALL _Ethernet_doPacket
+//USART.c,80 :: 		}
+	goto	L_SendCommandToCell_10
+L_SendCommandToCell_11:
+//USART.c,81 :: 		TXREG1 = '0' + cellCommand[number];       //  байт №4   - состояние, в которое нужно привести соленоид (в соответствии с командой по  Ethernet)
+	FSR0L <-  0 + FARG_SendCommandToCell+0
+	STACK_0 <- *FSR0L
+	TXREG1 <-  48 + STACK_0  [Optimized To Dest]
+	TXREG1 <- TXREG1
+//USART.c,82 :: 		while(TXSTA1.TRMT==0);                    // ждем пока не освободится передатчик USART
+L_SendCommandToCell_12:
+	STACK_1 <-  TXSTA1 & 2
+	STACK_0 <- 1
+	STACK_1 <-  STACK_1 shr STACK_0
+	if ( STACK_1 = 0) then goto L_SendCommandToCell_12
+L_SendCommandToCell_13:
+//USART.c,83 :: 		SET_RS485_IN;
+	PORTB <-  PORTB & -65
+	PORTB <-  PORTB & -129
+//USART.c,84 :: 		delay_us(3);
+	asm: MOVLW	5
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+	asm: nop
+	asm: nop
+//USART.c,85 :: 		RCSTA1.CREN=0;                            // очистим ошибки фрейминга, возникшие из-за переключения ADM3485
+	RCSTA1 <-  RCSTA1 & -17
+//USART.c,86 :: 		RCSTA1.CREN=1;
+	RCSTA1 <-  RCSTA1 | 16
+//USART.c,87 :: 		rxBuf[0]='8';rxBuf[1]='8';rxBuf[2]='8';rxBuf[3]='8';rxBuf[4]='8';rxBuf[5]='8'; // испортим содержимое приемного буфера чтобы потом знать, пришло что-то новое или нет
+	_rxBuf <- 56
+	_rxBuf+1 <- 56
+	_rxBuf+2 <- 56
+	_rxBuf+3 <- 56
+	_rxBuf+4 <- 56
+	_rxBuf+5 <- 56
+//USART.c,88 :: 		rxReadyFlag = 0;                          // сброс флага готовности приемного буфера
+	_rxReadyFlag <- 0
+  end
+
+_UsartSendBuf:
+  begin
+//USART.c,94 :: 		while((*str)!=0)
+L_UsartSendBuf_14:
+	STACK_1 <- *FARG_UsartSendBuf+0
+	if ( STACK_1 = 0) then goto L_UsartSendBuf_15
+//USART.c,96 :: 		MyUsartWrite1(*str++);
+	FARG_MyUsartWrite1+0 <- *FARG_UsartSendBuf+0
+	FARG_MyUsartWrite1+0 <- FARG_MyUsartWrite1+0
+	CALL _MyUsartWrite1
+	FARG_UsartSendBuf+0 <-  FARG_UsartSendBuf+0 + 1
+	FARG_UsartSendBuf+0 <- FARG_UsartSendBuf+0
+//USART.c,97 :: 		}
+	goto	L_UsartSendBuf_14
+L_UsartSendBuf_15:
+//USART.c,98 :: 		MyUsartWrite1(0x0d);
+	FARG_MyUsartWrite1+0 <- 13
+	CALL _MyUsartWrite1
+//USART.c,99 :: 		MyUsartWrite1(0x0a);
+	FARG_MyUsartWrite1+0 <- 10
+	CALL _MyUsartWrite1
+  end
+
+_Interrupt:
+  begin
+//USART.c,107 :: 		if(PIR1.RC1IF) {           // прерывание по приему байта по USART
+	if (!PIR1) then goto L_Interrupt_16
+//USART.c,108 :: 		PIR1.RC1IF = 0;
+	PIR1 <-  PIR1 & -33
+//USART.c,110 :: 		tmp = RCREG1;
+	Interrupt_tmp_L0 <- RCREG1
+//USART.c,111 :: 		if (tmp==0x03) {          // 0x03 - признак начала посылки
+	if ( RCREG1 != 3) then goto L_Interrupt_17
+//USART.c,112 :: 		rxCounter = 1;
+	_rxCounter <- 1
+//USART.c,113 :: 		}
+L_Interrupt_17:
+//USART.c,114 :: 		if (rxCounter!=0) {
+	if ( _rxCounter = 0) then goto L_Interrupt_18
+//USART.c,115 :: 		rxBuf[rxCounter-1] = tmp;
+	STACK_0 <-  _rxCounter - 1
+	FSR1L <-  0 + STACK_0
+	*FSR1L <- Interrupt_tmp_L0
+//USART.c,116 :: 		rxCounter++;
+	_rxCounter <-  _rxCounter + 1
+	_rxCounter <- _rxCounter
+//USART.c,117 :: 		if(rxCounter>=7) {       // если вся посылка уже получена (6 байт),
+	if ( _rxCounter < 7) then goto L_Interrupt_19
+//USART.c,118 :: 		rxCounter = 0;          // обнуляем счетчик
+	_rxCounter <- 0
+//USART.c,119 :: 		rxReadyFlag = 1;        // ставим флаг готовности
+	_rxReadyFlag <- 1
+//USART.c,120 :: 		}
+L_Interrupt_19:
+//USART.c,121 :: 		}
+L_Interrupt_18:
+//USART.c,122 :: 		}
+L_Interrupt_16:
+//USART.c,123 :: 		if (PIR1.F0) {             // Произошло прерывание от TMR1
+	if (!PIR1) then goto L_Interrupt_20
+//USART.c,124 :: 		PIR1.F0=0;
+	PIR1 <-  PIR1 & -2
+//USART.c,125 :: 		T1CON=0;
+	T1CON <- 0
+//USART.c,126 :: 		timer1Flag = 1;           // время вышло
+	_timer1Flag <- 1
+//USART.c,127 :: 		}
+L_Interrupt_20:
+  end
+
+GlobalIniUSART:
+  begin
+  end
+

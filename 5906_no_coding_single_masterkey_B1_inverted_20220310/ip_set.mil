@@ -1,0 +1,50 @@
+_ip_get:
+  begin
+//ip_set.c,29 :: 		ip_read();    // чтение IP из EEPROM
+	CALL _ip_read
+  end
+
+_ip_set:
+  begin
+//ip_set.c,40 :: 		while(1)                        // do forever
+L_ip_set_0:
+//ip_set.c,42 :: 		Ethernet_doPacket() ;   // process incoming Ethernet packets
+	CALL _Ethernet_doPacket
+//ip_set.c,44 :: 		asm CLRWDT;        // сброс сторожевого таймера
+	asm: CLRWDT
+//ip_set.c,45 :: 		if (!ip_new_flag) break;     // выход в основной режим
+	if (!_ip_new_flag) then goto L_ip_set_1
+L_ip_set_2:
+//ip_set.c,47 :: 		if (cntr_1  <= 6400 )  cntr_1++ ;
+	if ( ip_set_cntr_1_L0 > 6400) then goto L_ip_set_3
+	ip_set_cntr_1_L0 <-  ip_set_cntr_1_L0 + 1
+	ip_set_cntr_1_L0 <- ip_set_cntr_1_L0
+	goto	L_ip_set_4
+L_ip_set_3:
+//ip_set.c,49 :: 		cntr_1 =0;
+	ip_set_cntr_1_L0 <- 0
+//ip_set.c,50 :: 		Led_G  = !Led_G;     //
+	STACK_0 <- !PORTC
+	PORTC <- setbit(STACK_0)
+//ip_set.c,51 :: 		}
+L_ip_set_4:
+//ip_set.c,53 :: 		if (cntr_2  <= 640 )  cntr_2++ ;
+	if ( ip_set_cntr_2_L0 > 640) then goto L_ip_set_5
+	ip_set_cntr_2_L0 <-  ip_set_cntr_2_L0 + 1
+	ip_set_cntr_2_L0 <- ip_set_cntr_2_L0
+	goto	L_ip_set_6
+L_ip_set_5:
+//ip_set.c,55 :: 		cntr_2 =0;
+	ip_set_cntr_2_L0 <- 0
+//ip_set.c,56 :: 		Led_Y  = !Led_Y;     //
+	STACK_0 <- !PORTC
+	PORTC <- setbit(STACK_0)
+//ip_set.c,57 :: 		}
+L_ip_set_6:
+//ip_set.c,58 :: 		}  // end   while(1)
+	goto	L_ip_set_0
+L_ip_set_1:
+//ip_set.c,59 :: 		ip_write();    // запись IP в EEPROM
+	CALL _ip_write
+  end
+

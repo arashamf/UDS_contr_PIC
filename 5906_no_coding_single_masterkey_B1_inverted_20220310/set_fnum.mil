@@ -1,0 +1,153 @@
+_Set_fnum:
+  begin
+//set_fnum.c,36 :: 		Read_Time();    //Reads time and date information from RTC
+	CALL _Read_Time
+//set_fnum.c,37 :: 		if ( year & 0x03  ) visocosny =0;  // два младших бита year =0 -> год високосный
+	STACK_0 <-  _year & 3
+	if (!STACK_0) then goto L_Set_fnum_0
+	_visocosny <- 0
+	goto	L_Set_fnum_1
+L_Set_fnum_0:
+//set_fnum.c,38 :: 		else  visocosny =1;
+	_visocosny <- 1
+L_Set_fnum_1:
+//set_fnum.c,39 :: 		date_num = date + pred_sum [visocosny] [month-1];
+	STACK_0 <-  24 * _visocosny
+	FLOC_Set_fnum+29 <-  0 + STACK_0
+	STACK_0 <-  _month - 1
+	STACK_0 <-  2 * STACK_0
+	STACK_0 <-  FLOC_Set_fnum+29 + STACK_0
+	STACK_0 <- *STACK_0
+	STACK_4 <-  _date + STACK_0
+	Set_fnum_date_num_L0 <- STACK_4
+//set_fnum.c,41 :: 		if( file_number != date_num )
+	if ( _file_number = STACK_4) then goto L_Set_fnum_2
+//set_fnum.c,43 :: 		flag_read_fat = 0;  // FAT в состоянии read =1, иначе 0
+	_flag_read_fat <- 0
+//set_fnum.c,44 :: 		file_number = date_num ;
+	_file_number <- Set_fnum_date_num_L0
+//set_fnum.c,46 :: 		if( !visocosny && (file_number==365) )
+	if (_visocosny) then goto L_Set_fnum_5
+	if ( _file_number != 365) then goto L_Set_fnum_5
+L30_ex_L_Set_fnum_5:
+//set_fnum.c,48 :: 		LOG_TXT[5] = '3';
+	Set_fnum_LOG_TXT_L0+5 <- 51
+//set_fnum.c,49 :: 		LOG_TXT[6] = '6';
+	Set_fnum_LOG_TXT_L0+6 <- 54
+//set_fnum.c,50 :: 		LOG_TXT[7] = '6';
+	Set_fnum_LOG_TXT_L0+7 <- 54
+//set_fnum.c,51 :: 		tmp =  Cf_Fat_Init(&PORTH,&PORTE);
+	FARG_Cf_Fat_Init+0 <- 0
+	FARG_Cf_Fat_Init+2 <- 0
+	CALL _Cf_Fat_Init
+	Set_fnum_tmp_L0 <- STACK_0
+//set_fnum.c,52 :: 		if ( tmp != 0 ) return 0;
+	if ( STACK_0 = 0) then goto L_Set_fnum_6
+	STACK_0 <- 0
+	return
+L_Set_fnum_6:
+//set_fnum.c,53 :: 		tmp = Cf_Fat_Assign(LOG_TXT,0xA0);
+	FARG_Cf_Fat_Assign+0 <- 0
+	FARG_Cf_Fat_Assign+2 <- 160
+	CALL _Cf_Fat_Assign
+	Set_fnum_tmp_L0 <- STACK_0
+//set_fnum.c,54 :: 		if ( tmp != 1 ) return 0;
+	if ( STACK_0 = 1) then goto L_Set_fnum_7
+	STACK_0 <- 0
+	return
+L_Set_fnum_7:
+//set_fnum.c,55 :: 		Cf_Fat_Rewrite();
+	CALL _Cf_Fat_Rewrite
+//set_fnum.c,57 :: 		}
+L_Set_fnum_5:
+//set_fnum.c,61 :: 		IntToStr(file_number, NUM_TXT) ;
+	FARG_IntToStr+0 <- _file_number
+	FARG_IntToStr+2 <- 0
+	CALL _IntToStr
+//set_fnum.c,62 :: 		if (NUM_TXT[3]==' ')  NUM_TXT[3] = '0';
+	if ( Set_fnum_NUM_TXT_L0+3 != 32) then goto L_Set_fnum_8
+	Set_fnum_NUM_TXT_L0+3 <- 48
+L_Set_fnum_8:
+//set_fnum.c,63 :: 		if (NUM_TXT[4]==' ')  NUM_TXT[4] = '0';
+	if ( Set_fnum_NUM_TXT_L0+4 != 32) then goto L_Set_fnum_9
+	Set_fnum_NUM_TXT_L0+4 <- 48
+L_Set_fnum_9:
+//set_fnum.c,64 :: 		LOG_TXT[5] = NUM_TXT[3];
+	Set_fnum_LOG_TXT_L0+5 <- Set_fnum_NUM_TXT_L0+3
+//set_fnum.c,65 :: 		LOG_TXT[6] = NUM_TXT[4];
+	Set_fnum_LOG_TXT_L0+6 <- Set_fnum_NUM_TXT_L0+4
+//set_fnum.c,66 :: 		LOG_TXT[7] = NUM_TXT[5];
+	Set_fnum_LOG_TXT_L0+7 <- Set_fnum_NUM_TXT_L0+5
+//set_fnum.c,67 :: 		tmp =  Cf_Fat_Init(&PORTH,&PORTE);
+	FARG_Cf_Fat_Init+0 <- 0
+	FARG_Cf_Fat_Init+2 <- 0
+	CALL _Cf_Fat_Init
+	Set_fnum_tmp_L0 <- STACK_0
+//set_fnum.c,68 :: 		if ( tmp != 0 ) return 0;      // init error
+	if ( STACK_0 = 0) then goto L_Set_fnum_10
+	STACK_0 <- 0
+	return
+L_Set_fnum_10:
+//set_fnum.c,69 :: 		tmp = Cf_Fat_Assign(LOG_TXT,0xA0);
+	FARG_Cf_Fat_Assign+0 <- 0
+	FARG_Cf_Fat_Assign+2 <- 160
+	CALL _Cf_Fat_Assign
+	Set_fnum_tmp_L0 <- STACK_0
+//set_fnum.c,70 :: 		if ( tmp != 1 ) return 0;      //  assign error
+	if ( STACK_0 = 1) then goto L_Set_fnum_11
+	STACK_0 <- 0
+	return
+L_Set_fnum_11:
+//set_fnum.c,71 :: 		Cf_Fat_Reset(&size);            // To read file, procedure returns size of file
+	FARG_Cf_Fat_Reset+0 <- 0
+	CALL _Cf_Fat_Reset
+//set_fnum.c,72 :: 		if (size == 0)  return 1;     // пустой файл, Rewrite или Append
+	if ( Set_fnum_size_L0 != 0) then goto L_Set_fnum_12
+	STACK_0 <- 1
+	return
+L_Set_fnum_12:
+//set_fnum.c,73 :: 		for (i = 1; i < 26 ; i++)  // год - в 24 и 25 позициях
+	Set_fnum_i_L0 <- 1
+L_Set_fnum_13:
+	if ( Set_fnum_i_L0 >= 26) then goto L_Set_fnum_14
+//set_fnum.c,75 :: 		Cf_Fat_Read(&caracter);    // пройти уже считанное
+	FARG_Cf_Fat_Read+0 <- 0
+	CALL _Cf_Fat_Read
+//set_fnum.c,76 :: 		if(i==24) tmp = (caracter - '0')*10;      //
+	if ( Set_fnum_i_L0 != 24) then goto L_Set_fnum_16
+	STACK_0 <-  Set_fnum_caracter_L0 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	Set_fnum_tmp_L0 <- STACK_0
+L_Set_fnum_16:
+//set_fnum.c,77 :: 		if(i==25) tmp += caracter - '0';      //
+	if ( Set_fnum_i_L0 != 25) then goto L_Set_fnum_17
+	STACK_0 <-  Set_fnum_caracter_L0 - 48  [Optimized To Dest]
+	Set_fnum_tmp_L0 <-  Set_fnum_tmp_L0 + STACK_0  [Optimized To Dest]
+	Set_fnum_tmp_L0 <- Set_fnum_tmp_L0
+L_Set_fnum_17:
+//set_fnum.c,78 :: 		}
+L_Set_fnum_15:
+//set_fnum.c,73 :: 		for (i = 1; i < 26 ; i++)  // год - в 24 и 25 позициях
+	Set_fnum_i_L0 <-  Set_fnum_i_L0 + 1
+	Set_fnum_i_L0 <- Set_fnum_i_L0
+//set_fnum.c,78 :: 		}
+	goto	L_Set_fnum_13
+L_Set_fnum_14:
+//set_fnum.c,79 :: 		if ( tmp == year ) return 2;     // год соответствует текущему, Append
+	if ( Set_fnum_tmp_L0 != _year) then goto L_Set_fnum_18
+	STACK_0 <- 2
+	return
+L_Set_fnum_18:
+//set_fnum.c,80 :: 		else  return 3;     // год не соответствует текущему, Rewrite
+	STACK_0 <- 3
+	return
+//set_fnum.c,81 :: 		} //
+L_Set_fnum_2:
+//set_fnum.c,83 :: 		file_number = date_num ;
+	_file_number <- Set_fnum_date_num_L0
+L_Set_fnum_20:
+//set_fnum.c,84 :: 		return 2;
+	STACK_0 <- 2
+	return
+  end
+

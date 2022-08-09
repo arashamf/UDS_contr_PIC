@@ -1,0 +1,295 @@
+_OneWireDirOut:
+  begin
+//termo.c,15 :: 		TRISD.F7 = 0;
+	TRISD <-  TRISD & -129
+  end
+
+_OneWireDirIn:
+  begin
+//termo.c,19 :: 		TRISD.F7 = 1;
+	TRISD <-  TRISD | 128
+  end
+
+_OneWireOn:
+  begin
+//termo.c,23 :: 		LATD.F7 = 1;
+	LATD <-  LATD | 128
+  end
+
+_OneWireOff:
+  begin
+//termo.c,27 :: 		LATD.F7 = 0;
+	LATD <-  LATD & -129
+  end
+
+_OneWireLevel:
+  begin
+//termo.c,31 :: 		if(PORTD.F7==0) return 0;
+	STACK_2 <-  PORTD & 128
+	STACK_0 <- 7
+	STACK_2 <-  STACK_2 shr STACK_0
+	if ( STACK_2 != 0) then goto L_OneWireLevel_0
+	STACK_0 <- 0
+	return
+L_OneWireLevel_0:
+//termo.c,32 :: 		if(PORTD.F7!=0) return 1;
+	STACK_2 <-  PORTD & 128
+	STACK_0 <- 7
+	STACK_2 <-  STACK_2 shr STACK_0
+	if ( STACK_2 = 0) then goto L_OneWireLevel_1
+	STACK_0 <- 1
+	return
+L_OneWireLevel_1:
+  end
+
+_OneWireReset:
+  begin
+//termo.c,38 :: 		OneWireOff();                               // Normal input no pull up
+	CALL _OneWireOff
+//termo.c,39 :: 		OneWireDirOut();                            // out at 0
+	CALL _OneWireDirOut
+//termo.c,40 :: 		delay_us(500);
+	asm: MOVLW	5
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	10
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,41 :: 		OneWireDirIn();                             // Set to input
+	CALL _OneWireDirIn
+//termo.c,42 :: 		delay_us(70);
+	asm: MOVLW	145
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,43 :: 		if ((OneWireLevel()) == 0)
+	CALL _OneWireLevel
+	if ( STACK_0 != 0) then goto L_OneWireReset_2
+//termo.c,45 :: 		delay_us(500);
+	asm: MOVLW	5
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	10
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,46 :: 		return 1;
+	STACK_0 <- 1
+	return
+//termo.c,47 :: 		}
+L_OneWireReset_2:
+//termo.c,48 :: 		delay_us(500);
+	asm: MOVLW	5
+	asm: MOVWF	STACK_11
+	asm: MOVLW	255
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_11,F
+	asm: GOTO	$+2
+	asm: GOTO	$+4
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: GOTO	$-5
+	asm: MOVLW	10
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,49 :: 		return 0;
+	STACK_0 <- 0
+	return
+  end
+
+_OneWireWriteByte:
+  begin
+//termo.c,63 :: 		OneWireDirIn();OneWireOff();     	//input 0
+	CALL _OneWireDirIn
+	CALL _OneWireOff
+//termo.c,64 :: 		for (i=0;i<=7;i++)
+	OneWireWriteByte_i_L0 <- 0
+L_OneWireWriteByte_3:
+	if ( OneWireWriteByte_i_L0 > 7) then goto L_OneWireWriteByte_4
+//termo.c,66 :: 		OneWireDirOut();  						//out0
+	CALL _OneWireDirOut
+//termo.c,67 :: 		if (dat & 0x01) {
+	STACK_0 <-  FARG_OneWireWriteByte+0 & 1
+	if (!STACK_0) then goto L_OneWireWriteByte_6
+//termo.c,68 :: 		delay_us(7);              // Send 1
+	asm: MOVLW	14
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,69 :: 		OneWireDirIn();        			// input
+	CALL _OneWireDirIn
+//termo.c,70 :: 		delay_us(70);
+	asm: MOVLW	145
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,71 :: 		}
+	goto	L_OneWireWriteByte_7
+L_OneWireWriteByte_6:
+//termo.c,73 :: 		delay_us(70);            	// Send 0
+	asm: MOVLW	145
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,74 :: 		OneWireDirIn();
+	CALL _OneWireDirIn
+//termo.c,75 :: 		delay_us(7);
+	asm: MOVLW	14
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,76 :: 		}
+L_OneWireWriteByte_7:
+//termo.c,77 :: 		dat>>=1;
+	STACK_0 <- 1
+	FARG_OneWireWriteByte+0 <-  FARG_OneWireWriteByte+0 shr STACK_0
+	FARG_OneWireWriteByte+0 <- FARG_OneWireWriteByte+0
+//termo.c,78 :: 		}
+L_OneWireWriteByte_5:
+//termo.c,64 :: 		for (i=0;i<=7;i++)
+	OneWireWriteByte_i_L0 <-  OneWireWriteByte_i_L0 + 1
+	OneWireWriteByte_i_L0 <- OneWireWriteByte_i_L0
+//termo.c,78 :: 		}
+	goto	L_OneWireWriteByte_3
+L_OneWireWriteByte_4:
+  end
+
+_OneWireReadByte:
+  begin
+//termo.c,89 :: 		unsigned char dat = 0;
+	OneWireReadByte_dat_L0 <- 0
+//termo.c,92 :: 		OneWireDirIn();OneWireOff();                  // Output '0' or input without pullup
+	CALL _OneWireDirIn
+	CALL _OneWireOff
+//termo.c,93 :: 		for (i=0;i<=7;i++)	{
+	OneWireReadByte_i_L0 <- 0
+L_OneWireReadByte_8:
+	if ( OneWireReadByte_i_L0 > 7) then goto L_OneWireReadByte_9
+//termo.c,94 :: 		OneWireDirOut();                          // Set output to '0'
+	CALL _OneWireDirOut
+//termo.c,95 :: 		delay_us(7);
+	asm: MOVLW	14
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,96 :: 		OneWireDirIn();                           // Set to input
+	CALL _OneWireDirIn
+//termo.c,97 :: 		delay_us(7);
+	asm: MOVLW	14
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,98 :: 		dat >>=1;
+	STACK_0 <- 1
+	OneWireReadByte_dat_L0 <-  OneWireReadByte_dat_L0 shr STACK_0
+	OneWireReadByte_dat_L0 <- OneWireReadByte_dat_L0
+//termo.c,99 :: 		if ((OneWireLevel())) { dat |= 0x80; }
+	CALL _OneWireLevel
+	if (!STACK_0) then goto L_OneWireReadByte_11
+	OneWireReadByte_dat_L0 <-  OneWireReadByte_dat_L0 | 128
+	OneWireReadByte_dat_L0 <- OneWireReadByte_dat_L0
+	goto	L_OneWireReadByte_12
+L_OneWireReadByte_11:
+//termo.c,100 :: 		else { dat &= 0x7f; }
+	OneWireReadByte_dat_L0 <-  OneWireReadByte_dat_L0 & 127
+	OneWireReadByte_dat_L0 <- OneWireReadByte_dat_L0
+L_OneWireReadByte_12:
+//termo.c,101 :: 		delay_us(70);
+	asm: MOVLW	145
+	asm: MOVWF	STACK_10
+	asm: DECFSZ	STACK_10,F
+	asm: GOTO	$-1
+	asm: nop
+//termo.c,102 :: 		}
+L_OneWireReadByte_10:
+//termo.c,93 :: 		for (i=0;i<=7;i++)	{
+	OneWireReadByte_i_L0 <-  OneWireReadByte_i_L0 + 1
+	OneWireReadByte_i_L0 <- OneWireReadByte_i_L0
+//termo.c,102 :: 		}
+	goto	L_OneWireReadByte_8
+L_OneWireReadByte_9:
+//termo.c,103 :: 		return dat;
+	STACK_0 <- OneWireReadByte_dat_L0
+	return
+  end
+
+_Termo_measure:
+  begin
+//termo.c,111 :: 		unsigned char crc8=0, i=0;
+	Termo_measure_i_L0 <- 0
+//termo.c,114 :: 		if(OneWireReset()) {
+	CALL _OneWireReset
+	if (!STACK_0) then goto L_Termo_measure_13
+//termo.c,115 :: 		OneWireWriteByte(0xCC);		//пропуск идентификации
+	FARG_OneWireWriteByte+0 <- 204
+	CALL _OneWireWriteByte
+//termo.c,116 :: 		OneWireWriteByte(0x44);		//запуск преобразования температуры
+	FARG_OneWireWriteByte+0 <- 68
+	CALL _OneWireWriteByte
+//termo.c,118 :: 		while(!OneWireLevel()){}    //ожидание преобразования
+L_Termo_measure_14:
+	CALL _OneWireLevel
+	if (!STACK_0) then goto L_Termo_measure_14
+L_Termo_measure_15:
+//termo.c,120 :: 		OneWireReset();						//сброс
+	CALL _OneWireReset
+//termo.c,121 :: 		OneWireWriteByte(0xCC);		//пропуск идентификации
+	FARG_OneWireWriteByte+0 <- 204
+	CALL _OneWireWriteByte
+//termo.c,122 :: 		OneWireWriteByte(0xBE);		//чтение памяти
+	FARG_OneWireWriteByte+0 <- 190
+	CALL _OneWireWriteByte
+//termo.c,124 :: 		for (i=0;i<9;i++)         //чтение памяти термодатчика
+	Termo_measure_i_L0 <- 0
+L_Termo_measure_16:
+	if ( Termo_measure_i_L0 >= 9) then goto L_Termo_measure_17
+//termo.c,126 :: 		memory[i]=OneWireReadByte();
+	FLOC_Termo_measure+10 <-  0 + Termo_measure_i_L0
+	CALL _OneWireReadByte
+	*FLOC_Termo_measure+10 <- STACK_0
+//termo.c,127 :: 		}
+L_Termo_measure_18:
+//termo.c,124 :: 		for (i=0;i<9;i++)         //чтение памяти термодатчика
+	Termo_measure_i_L0 <-  Termo_measure_i_L0 + 1
+	Termo_measure_i_L0 <- Termo_measure_i_L0
+//termo.c,127 :: 		}
+	goto	L_Termo_measure_16
+L_Termo_measure_17:
+//termo.c,128 :: 		return ((memory[1]<<8)+(memory[0]))>>1;
+	STACK_2 <- 8
+	STACK_0 <-  Termo_measure_memory_L0+1 shl STACK_2
+	STACK_3 <-  STACK_0 + Termo_measure_memory_L0
+	STACK_2 <- 1
+	STACK_0 <-  STACK_3 shr STACK_2
+	STACK_0 <- STACK_0
+	return
+//termo.c,129 :: 		}
+L_Termo_measure_13:
+  end
+

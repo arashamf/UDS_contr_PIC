@@ -1,0 +1,1536 @@
+_Ethernet_UserTCP:
+  begin
+//ethernet.c,13 :: 		unsigned int    len = 0 ;                   // my reply length
+	Ethernet_UserTCP_len_L0 <- 0
+//ethernet.c,27 :: 		if(localPort != 25006)  {                      // I listen only to web request on port 80
+	if ( FARG_Ethernet_UserTCP+4 = 25006) then goto L_Ethernet_UserTCP_0
+//ethernet.c,28 :: 		return(0) ;
+	STACK_0 <- 0
+	return
+//ethernet.c,29 :: 		}
+L_Ethernet_UserTCP_0:
+//ethernet.c,31 :: 		Led_Y  = 0;  // включить желтый сд
+	PORTC <-  PORTC & -3
+//ethernet.c,65 :: 		for(i = 0 ; i < 127 ; i++)
+	Ethernet_UserTCP_i_L0 <- 0
+L_Ethernet_UserTCP_1:
+	if ( Ethernet_UserTCP_i_L0 >= 127) then goto L_Ethernet_UserTCP_2
+//ethernet.c,67 :: 		getRequest[i] = Ethernet_getByte() ;  // 0..4 GET, 5 - ? /
+	FLOC_Ethernet_UserTCP+128 <-  0 + Ethernet_UserTCP_i_L0
+	CALL _Ethernet_getByte
+	*FLOC_Ethernet_UserTCP+128 <- STACK_0
+//ethernet.c,68 :: 		}
+L_Ethernet_UserTCP_3:
+//ethernet.c,65 :: 		for(i = 0 ; i < 127 ; i++)
+	Ethernet_UserTCP_i_L0 <-  Ethernet_UserTCP_i_L0 + 1
+	Ethernet_UserTCP_i_L0 <- Ethernet_UserTCP_i_L0
+//ethernet.c,68 :: 		}
+	goto	L_Ethernet_UserTCP_1
+L_Ethernet_UserTCP_2:
+//ethernet.c,69 :: 		getRequest[127] = 0 ;   // '\0' = 0 -конец строки
+	_getRequest+127 <- 0
+//ethernet.c,74 :: 		if(memcmp(getRequest, httpMethod, 5)) {      // only GET method is supported here
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 5
+	CALL _memcmp
+	if (!STACK_0) then goto L_Ethernet_UserTCP_4
+//ethernet.c,75 :: 		Led_Y  = 1; return(0) ;
+	PORTC <-  PORTC | 2
+	STACK_0 <- 0
+	return
+//ethernet.c,76 :: 		}
+L_Ethernet_UserTCP_4:
+//ethernet.c,78 :: 		len =  putConstString(httpHeader) ;             // HTTP header
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <- STACK_0
+//ethernet.c,79 :: 		len += putConstString(httpMimeTypeScript) ;       // with HTML MIME type
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,81 :: 		if ( (memcmp(getRequest+21, txt_0read, 4 )) && (memcmp(getRequest+21, txt_read, 4)) && (memcmp(getRequest+21, txt_status, 4 )) )  {
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (!STACK_0) then goto L_Ethernet_UserTCP_7
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (!STACK_0) then goto L_Ethernet_UserTCP_7
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (!STACK_0) then goto L_Ethernet_UserTCP_7
+L57_ex_L_Ethernet_UserTCP_7:
+//ethernet.c,83 :: 		My_str_n(dyna, getRequest, 84);  // копирует /добавляет 84 символа
+	FARG_My_str_n+0 <- 0
+	FARG_My_str_n+2 <- 0
+	FARG_My_str_n+4 <- 84
+	CALL _My_str_n
+//ethernet.c,84 :: 		log_write ( COMMAND, dyna, tmp );   // записать в журнал - команда  84 символа
+	FARG_log_write+0 <- 2
+	FARG_log_write+1 <- 0
+	FARG_log_write+3 <- Ethernet_UserTCP_tmp_L0
+	CALL _log_write
+//ethernet.c,85 :: 		}
+L_Ethernet_UserTCP_7:
+//ethernet.c,87 :: 		len += putShConstString("stoika=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,89 :: 		Num_to_0str(myIpAddr[0], dyna);  // преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	FARG_Num_to_0str+0 <- _myIpAddr
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,90 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,91 :: 		len += putShConstString(".") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,93 :: 		Num_to_0str(myIpAddr[1], dyna);  // преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	FARG_Num_to_0str+0 <- _myIpAddr+1
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,94 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,95 :: 		len += putShConstString(".") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,97 :: 		Num_to_0str(myIpAddr[2], dyna);  // преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	FARG_Num_to_0str+0 <- _myIpAddr+2
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,98 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,99 :: 		len += putShConstString(".") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,101 :: 		Num_to_0str(myIpAddr[3], dyna);  // преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	FARG_Num_to_0str+0 <- _myIpAddr+3
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,102 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,104 :: 		if (!memcmp(getRequest+5, txt_command, 13)) {         // начало команды: command port
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 13
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_8
+//ethernet.c,105 :: 		cmd_port_num =  (getRequest[19] - '0') + 10*(getRequest[18] - '0');  // вычисляем номер порта, куда идет обращение
+	_cmd_port_num <-  _getRequest+19 - 48  [Optimized To Dest]
+	STACK_0 <-  _getRequest+18 - 48  [Optimized To Dest]
+	STACK_0 <-  10 * STACK_0  [Optimized To Dest]
+	_cmd_port_num <-  _cmd_port_num + STACK_0  [Optimized To Dest]
+	_cmd_port_num <- _cmd_port_num
+//ethernet.c,106 :: 		if (ip_new_flag) {     // - флаг запуска в режиме установки нового IP (=1)
+	if (!_ip_new_flag) then goto L_Ethernet_UserTCP_9
+//ethernet.c,107 :: 		if (! ( cmd_port_num == 0)  )  goto ERR_CMD;   // команда для всей стойки
+	if ( _cmd_port_num != 0) then goto ___Ethernet_UserTCP_ERR_CMD
+L_Ethernet_UserTCP_10:
+//ethernet.c,108 :: 		if(!memcmp(getRequest+21, txt_iset, 4))  {     // команда IP SET стойки
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_11
+//ethernet.c,109 :: 		myIpAddr[0] =  10*(getRequest[30] - '0') + (getRequest[31] - '0');   // вычисление первого байта IP
+	STACK_0 <-  _getRequest+30 - 48  [Optimized To Dest]
+	STACK_0 <-  10 * STACK_0  [Optimized To Dest]
+	STACK_2 <-  _getRequest+31 - 48  [Optimized To Dest]
+	_myIpAddr <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_myIpAddr <- _myIpAddr
+//ethernet.c,110 :: 		if  (getRequest[29] == '1')   myIpAddr[0] +=  100;
+	if ( _getRequest+29 != 49) then goto L_Ethernet_UserTCP_12
+	_myIpAddr <-  _myIpAddr + 100  [Optimized To Dest]
+	_myIpAddr <- _myIpAddr
+	goto	L_Ethernet_UserTCP_13
+L_Ethernet_UserTCP_12:
+//ethernet.c,111 :: 		else if  (getRequest[29] == '2') myIpAddr[0] +=  200;
+	if ( _getRequest+29 != 50) then goto L_Ethernet_UserTCP_14
+	_myIpAddr <-  _myIpAddr + 200  [Optimized To Dest]
+	_myIpAddr <- _myIpAddr
+L_Ethernet_UserTCP_14:
+L_Ethernet_UserTCP_13:
+//ethernet.c,113 :: 		myIpAddr[1] =  10*(getRequest[34] - '0') + (getRequest[35] - '0');    // вычисление 2 байта IP
+	STACK_0 <-  _getRequest+34 - 48  [Optimized To Dest]
+	STACK_0 <-  10 * STACK_0  [Optimized To Dest]
+	STACK_2 <-  _getRequest+35 - 48  [Optimized To Dest]
+	_myIpAddr+1 <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_myIpAddr+1 <- _myIpAddr+1
+//ethernet.c,114 :: 		if  (getRequest[33] == '1')   myIpAddr[1] +=  100;
+	if ( _getRequest+33 != 49) then goto L_Ethernet_UserTCP_15
+	_myIpAddr+1 <-  _myIpAddr+1 + 100  [Optimized To Dest]
+	_myIpAddr+1 <- _myIpAddr+1
+	goto	L_Ethernet_UserTCP_16
+L_Ethernet_UserTCP_15:
+//ethernet.c,115 :: 		else if  (getRequest[33] == '2') myIpAddr[1] +=  200;
+	if ( _getRequest+33 != 50) then goto L_Ethernet_UserTCP_17
+	_myIpAddr+1 <-  _myIpAddr+1 + 200  [Optimized To Dest]
+	_myIpAddr+1 <- _myIpAddr+1
+L_Ethernet_UserTCP_17:
+L_Ethernet_UserTCP_16:
+//ethernet.c,117 :: 		myIpAddr[2] =  10*(getRequest[38] - '0') + (getRequest[39] - '0');    // вычисление 3 байта IP
+	STACK_0 <-  _getRequest+38 - 48  [Optimized To Dest]
+	STACK_0 <-  10 * STACK_0  [Optimized To Dest]
+	STACK_2 <-  _getRequest+39 - 48  [Optimized To Dest]
+	_myIpAddr+2 <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_myIpAddr+2 <- _myIpAddr+2
+//ethernet.c,118 :: 		if  (getRequest[37] == '1')   myIpAddr[2] +=  100;
+	if ( _getRequest+37 != 49) then goto L_Ethernet_UserTCP_18
+	_myIpAddr+2 <-  _myIpAddr+2 + 100  [Optimized To Dest]
+	_myIpAddr+2 <- _myIpAddr+2
+	goto	L_Ethernet_UserTCP_19
+L_Ethernet_UserTCP_18:
+//ethernet.c,119 :: 		else if  (getRequest[37] == '2') myIpAddr[2] +=  200;
+	if ( _getRequest+37 != 50) then goto L_Ethernet_UserTCP_20
+	_myIpAddr+2 <-  _myIpAddr+2 + 200  [Optimized To Dest]
+	_myIpAddr+2 <- _myIpAddr+2
+L_Ethernet_UserTCP_20:
+L_Ethernet_UserTCP_19:
+//ethernet.c,121 :: 		myIpAddr[3] =  10*(getRequest[42] - '0') + (getRequest[43] - '0');    // вычисление 4 байта IP
+	STACK_0 <-  _getRequest+42 - 48  [Optimized To Dest]
+	STACK_0 <-  10 * STACK_0  [Optimized To Dest]
+	STACK_2 <-  _getRequest+43 - 48  [Optimized To Dest]
+	_myIpAddr+3 <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_myIpAddr+3 <- _myIpAddr+3
+//ethernet.c,122 :: 		if  (getRequest[41] == '1')   myIpAddr[3] +=  100;
+	if ( _getRequest+41 != 49) then goto L_Ethernet_UserTCP_21
+	_myIpAddr+3 <-  _myIpAddr+3 + 100  [Optimized To Dest]
+	_myIpAddr+3 <- _myIpAddr+3
+	goto	L_Ethernet_UserTCP_22
+L_Ethernet_UserTCP_21:
+//ethernet.c,123 :: 		else if  (getRequest[41] == '2') myIpAddr[3] +=  200;
+	if ( _getRequest+41 != 50) then goto L_Ethernet_UserTCP_23
+	_myIpAddr+3 <-  _myIpAddr+3 + 200  [Optimized To Dest]
+	_myIpAddr+3 <- _myIpAddr+3
+L_Ethernet_UserTCP_23:
+L_Ethernet_UserTCP_22:
+//ethernet.c,124 :: 		tmp =Set_fnum();
+	CALL _Set_fnum
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,126 :: 		log_write ( IP, " :new_ip                    ", tmp );   // записать в журнал - команда  (28 символов )
+	FARG_log_write+0 <- 5
+	FARG_log_write+1 <- 0
+	FARG_log_write+3 <- Ethernet_UserTCP_tmp_L0
+	CALL _log_write
+//ethernet.c,127 :: 		ip_new_flag = 0; // сброс - флаг запуска в режиме установки нового IP (=1)
+	_ip_new_flag <- 0
+//ethernet.c,128 :: 		}
+	goto	L_Ethernet_UserTCP_24
+L_Ethernet_UserTCP_11:
+//ethernet.c,129 :: 		else goto ERR_CMD;
+	goto	___Ethernet_UserTCP_ERR_CMD
+L_Ethernet_UserTCP_24:
+//ethernet.c,131 :: 		len += putShConstString("result=accepted") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	STACK_0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- STACK_0
+//ethernet.c,132 :: 		Led_Y  = 1;
+	PORTC <-  PORTC | 2
+//ethernet.c,133 :: 		return(len) ;
+	STACK_0 <- STACK_0
+	return
+//ethernet.c,135 :: 		ERR_CMD:                  len += putShConstString("result=error_ip_command") ;
+___Ethernet_UserTCP_ERR_CMD:
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,136 :: 		tmp =Set_fnum();
+	CALL _Set_fnum
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,138 :: 		log_write ( CMD, " error_ip_command           ", tmp );   // записать в журнал - команда  (28 символов )
+	FARG_log_write+0 <- 3
+	FARG_log_write+1 <- 0
+	FARG_log_write+3 <- Ethernet_UserTCP_tmp_L0
+	CALL _log_write
+//ethernet.c,139 :: 		Led_Y  = 1;
+	PORTC <-  PORTC | 2
+//ethernet.c,140 :: 		return(len) ;                                             // return to the library with the number of bytes to transmit
+	STACK_0 <- Ethernet_UserTCP_len_L0
+	return
+//ethernet.c,141 :: 		}
+L_Ethernet_UserTCP_9:
+//ethernet.c,143 :: 		if ( cmd_port_num == 0) { // команда для всей стойки
+	if ( _cmd_port_num != 0) then goto L_Ethernet_UserTCP_25
+//ethernet.c,144 :: 		if(!memcmp(getRequest+21, txt_status, 4)) {   // команда status стойки
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_26
+//ethernet.c,145 :: 		len += putShConstString("&state=OK\r\n");
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,146 :: 		for (tmp=1;tmp<15;tmp++)
+	Ethernet_UserTCP_tmp_L0 <- 1
+L_Ethernet_UserTCP_27:
+	if ( Ethernet_UserTCP_tmp_L0 >= 15) then goto L_Ethernet_UserTCP_28
+//ethernet.c,148 :: 		sprintf(tmpBuf,"cell_%02d=",tmp);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	FARG_sprintf+5 <- Ethernet_UserTCP_tmp_L0
+	CALL _sprintf
+//ethernet.c,149 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,150 :: 		if(cellState[tmp][4]=='8') {
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_2 <- *FSR0L
+	if ( STACK_2 != 56) then goto L_Ethernet_UserTCP_30
+//ethernet.c,151 :: 		len += putShConstString("no\r\n");
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,152 :: 		}
+	goto	L_Ethernet_UserTCP_31
+L_Ethernet_UserTCP_30:
+//ethernet.c,154 :: 		if (tmp == 14)            //для 14 ячейки особые условия
+	if ( Ethernet_UserTCP_tmp_L0 != 14) then goto L_Ethernet_UserTCP_32
+//ethernet.c,156 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][0]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	FSR0L <-  0 + STACK_0
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,157 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,158 :: 		if (cellState[tmp][1] == '0')   //инверсия 2-го байта
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	STACK_2 <- *FSR0L
+	if ( STACK_2 != 48) then goto L_Ethernet_UserTCP_33
+//ethernet.c,160 :: 		sprintf(tmpBuf,"%c,",'1');
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	FARG_sprintf+5 <- 49
+	CALL _sprintf
+//ethernet.c,161 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,162 :: 		}
+	goto	L_Ethernet_UserTCP_34
+L_Ethernet_UserTCP_33:
+//ethernet.c,165 :: 		if (cellState[tmp][1] == '1')
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	STACK_2 <- *FSR0L
+	if ( STACK_2 != 49) then goto L_Ethernet_UserTCP_35
+//ethernet.c,167 :: 		sprintf(tmpBuf,"%c,",'0');
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	FARG_sprintf+5 <- 48
+	CALL _sprintf
+//ethernet.c,168 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,169 :: 		}
+	goto	L_Ethernet_UserTCP_36
+L_Ethernet_UserTCP_35:
+//ethernet.c,172 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][1]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,173 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,174 :: 		}
+L_Ethernet_UserTCP_36:
+//ethernet.c,175 :: 		}
+L_Ethernet_UserTCP_34:
+//ethernet.c,176 :: 		if (cellState[tmp][2] == '0')  //инверсия 3-го байта
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	STACK_2 <- *FSR0L
+	if ( STACK_2 != 48) then goto L_Ethernet_UserTCP_37
+//ethernet.c,178 :: 		sprintf(tmpBuf,"%c,",'1');
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	FARG_sprintf+5 <- 49
+	CALL _sprintf
+//ethernet.c,179 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,180 :: 		}
+	goto	L_Ethernet_UserTCP_38
+L_Ethernet_UserTCP_37:
+//ethernet.c,183 :: 		if (cellState[tmp][2] == '1')
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	STACK_2 <- *FSR0L
+	if ( STACK_2 != 49) then goto L_Ethernet_UserTCP_39
+//ethernet.c,185 :: 		sprintf(tmpBuf,"%c,",'0');
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	FARG_sprintf+5 <- 48
+	CALL _sprintf
+//ethernet.c,186 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,187 :: 		}
+	goto	L_Ethernet_UserTCP_40
+L_Ethernet_UserTCP_39:
+//ethernet.c,190 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][2]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,191 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,192 :: 		}
+L_Ethernet_UserTCP_40:
+//ethernet.c,193 :: 		}
+L_Ethernet_UserTCP_38:
+//ethernet.c,194 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][3]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,195 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,196 :: 		sprintf(tmpBuf,"%c\r\n",cellState[tmp][4]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,197 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,198 :: 		}
+	goto	L_Ethernet_UserTCP_41
+L_Ethernet_UserTCP_32:
+//ethernet.c,201 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][0]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	FSR0L <-  0 + STACK_0
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,202 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,203 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][1]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,204 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,205 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][2]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,206 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,207 :: 		sprintf(tmpBuf,"%c,",cellState[tmp][3]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,208 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,209 :: 		sprintf(tmpBuf,"%c\r\n",cellState[tmp][4]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * Ethernet_UserTCP_tmp_L0
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,210 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,211 :: 		}
+L_Ethernet_UserTCP_41:
+//ethernet.c,212 :: 		}
+L_Ethernet_UserTCP_31:
+//ethernet.c,213 :: 		}
+L_Ethernet_UserTCP_29:
+//ethernet.c,146 :: 		for (tmp=1;tmp<15;tmp++)
+	Ethernet_UserTCP_tmp_L0 <-  Ethernet_UserTCP_tmp_L0 + 1
+	Ethernet_UserTCP_tmp_L0 <- Ethernet_UserTCP_tmp_L0
+//ethernet.c,213 :: 		}
+	goto	L_Ethernet_UserTCP_27
+L_Ethernet_UserTCP_28:
+//ethernet.c,214 :: 		}
+	goto	L_Ethernet_UserTCP_42
+L_Ethernet_UserTCP_26:
+//ethernet.c,217 :: 		else if(!memcmp(getRequest+21, txt_rtcr, 4))  {  // команда 	rtcr:
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_43
+//ethernet.c,218 :: 		len += putShConstString("&rtcr=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,219 :: 		rtc_read();     //  Чтение RTC  в dyna[]
+	CALL _rtc_read
+//ethernet.c,220 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,221 :: 		}
+	goto	L_Ethernet_UserTCP_44
+L_Ethernet_UserTCP_43:
+//ethernet.c,223 :: 		else if(!memcmp(getRequest+21, txt_rtds, 4)) {   // команда 	rtds:
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_45
+//ethernet.c,224 :: 		len += putConstString("&rtds=") ;
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,226 :: 		if (   ( ( (getRequest[28] - '0')*10 ) + (getRequest[29] - '0')  )  >31 )
+	STACK_0 <-  _getRequest+28 - 48
+	STACK_0 <-  STACK_0 * 10
+	STACK_2 <-  _getRequest+29 - 48
+	STACK_2 <-  STACK_0 + STACK_2
+	if ( STACK_2 <= 31) then goto L_Ethernet_UserTCP_46
+//ethernet.c,227 :: 		{ len += putConstString("error") ; goto ILLEGAL_COMMAND;  }  //  date
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_46:
+//ethernet.c,228 :: 		if (   ( ( (getRequest[33] - '0')*10 ) + (getRequest[34] - '0')  )  >12 )
+	STACK_0 <-  _getRequest+33 - 48
+	STACK_0 <-  STACK_0 * 10
+	STACK_2 <-  _getRequest+34 - 48
+	STACK_2 <-  STACK_0 + STACK_2
+	if ( STACK_2 <= 12) then goto L_Ethernet_UserTCP_47
+//ethernet.c,229 :: 		{ len += putConstString("error") ; goto ILLEGAL_COMMAND;  }   //  month
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_47:
+//ethernet.c,230 :: 		if (   ( ( (getRequest[38] - '0')*10 ) + (getRequest[39] - '0')  )  >99 )
+	STACK_0 <-  _getRequest+38 - 48
+	STACK_0 <-  STACK_0 * 10
+	STACK_2 <-  _getRequest+39 - 48
+	STACK_2 <-  STACK_0 + STACK_2
+	if ( STACK_2 <= 99) then goto L_Ethernet_UserTCP_48
+//ethernet.c,231 :: 		{ len += putConstString("error") ; goto ILLEGAL_COMMAND;  }   //  year
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_48:
+//ethernet.c,233 :: 		rtc_read();
+	CALL _rtc_read
+//ethernet.c,234 :: 		date =     ( (getRequest[28] - '0')*10 ) + (getRequest[29] - '0');
+	STACK_0 <-  _getRequest+28 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	STACK_2 <-  _getRequest+29 - 48  [Optimized To Dest]
+	_date <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_date <- _date
+//ethernet.c,235 :: 		month =    ( (getRequest[33] - '0')*10 ) + (getRequest[34] - '0');
+	STACK_0 <-  _getRequest+33 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	STACK_2 <-  _getRequest+34 - 48  [Optimized To Dest]
+	_month <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_month <- _month
+//ethernet.c,236 :: 		year =     ( (getRequest[38] - '0')*10 ) + (getRequest[39] - '0');
+	STACK_0 <-  _getRequest+38 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	STACK_2 <-  _getRequest+39 - 48  [Optimized To Dest]
+	_year <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_year <- _year
+//ethernet.c,237 :: 		rtc_set();  // установка часов
+	CALL _rtc_set
+//ethernet.c,239 :: 		len += putString(dyna) ;
+	FARG_Ethernet_putString+0 <- 0
+	CALL _Ethernet_putString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,240 :: 		}
+	goto	L_Ethernet_UserTCP_49
+L_Ethernet_UserTCP_45:
+//ethernet.c,243 :: 		else if(!memcmp(getRequest+21, txt_rtss, 4)) {   // команда 	rtss:
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_50
+//ethernet.c,244 :: 		len += putConstString("&rtss=") ;
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,246 :: 		if (   ( ( (getRequest[28] - '0')*10 ) + (getRequest[29] - '0')  )  >24 )
+	STACK_0 <-  _getRequest+28 - 48
+	STACK_0 <-  STACK_0 * 10
+	STACK_2 <-  _getRequest+29 - 48
+	STACK_2 <-  STACK_0 + STACK_2
+	if ( STACK_2 <= 24) then goto L_Ethernet_UserTCP_51
+//ethernet.c,247 :: 		{ len += putConstString("error") ; goto ILLEGAL_COMMAND;  } //  hour
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_51:
+//ethernet.c,248 :: 		if (   ( ( (getRequest[33] - '0')*10 ) + (getRequest[34] - '0')  )  >59 )
+	STACK_0 <-  _getRequest+33 - 48
+	STACK_0 <-  STACK_0 * 10
+	STACK_2 <-  _getRequest+34 - 48
+	STACK_2 <-  STACK_0 + STACK_2
+	if ( STACK_2 <= 59) then goto L_Ethernet_UserTCP_52
+//ethernet.c,249 :: 		{ len += putConstString("error") ; goto ILLEGAL_COMMAND;  }   //  minute
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_52:
+//ethernet.c,250 :: 		if (   ( ( (getRequest[38] - '0')*10 ) + (getRequest[39] - '0')  )  >59 )
+	STACK_0 <-  _getRequest+38 - 48
+	STACK_0 <-  STACK_0 * 10
+	STACK_2 <-  _getRequest+39 - 48
+	STACK_2 <-  STACK_0 + STACK_2
+	if ( STACK_2 <= 59) then goto L_Ethernet_UserTCP_53
+//ethernet.c,251 :: 		{ len += putConstString("error") ; goto ILLEGAL_COMMAND;  }   //  second
+	FARG_Ethernet_putConstString+0 <- 0
+	CALL _Ethernet_putConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_53:
+//ethernet.c,253 :: 		rtc_read();
+	CALL _rtc_read
+//ethernet.c,254 :: 		hour =     ( (getRequest[28] - '0')*10 ) + (getRequest[29] - '0');
+	STACK_0 <-  _getRequest+28 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	STACK_2 <-  _getRequest+29 - 48  [Optimized To Dest]
+	_hour <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_hour <- _hour
+//ethernet.c,255 :: 		minute =   ( (getRequest[33] - '0')*10 ) + (getRequest[34] - '0');
+	STACK_0 <-  _getRequest+33 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	STACK_2 <-  _getRequest+34 - 48  [Optimized To Dest]
+	_minute <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_minute <- _minute
+//ethernet.c,256 :: 		second =   ( (getRequest[38] - '0')*10 ) + (getRequest[39] - '0');
+	STACK_0 <-  _getRequest+38 - 48  [Optimized To Dest]
+	STACK_0 <-  STACK_0 * 10  [Optimized To Dest]
+	STACK_2 <-  _getRequest+39 - 48  [Optimized To Dest]
+	_second <-  STACK_0 + STACK_2  [Optimized To Dest]
+	_second <- _second
+//ethernet.c,257 :: 		rtc_set();  // установка часов
+	CALL _rtc_set
+//ethernet.c,259 :: 		len += putString(dyna) ;
+	FARG_Ethernet_putString+0 <- 0
+	CALL _Ethernet_putString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,260 :: 		}
+	goto	L_Ethernet_UserTCP_54
+L_Ethernet_UserTCP_50:
+//ethernet.c,262 :: 		else if(!memcmp(getRequest+21, txt_term, 4)) {   // команда 	term:
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_55
+//ethernet.c,263 :: 		len += putShConstString("&term=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,264 :: 		Num_to_0str(Termo_measure(), dyna);  //преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	CALL _Termo_measure
+	FARG_Num_to_0str+0 <- STACK_0
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,265 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,266 :: 		}
+	goto	L_Ethernet_UserTCP_56
+L_Ethernet_UserTCP_55:
+//ethernet.c,270 :: 		else if(!memcmp(getRequest+21, txt_0read, 4))   {    //  подана  команда, 0read
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_57
+//ethernet.c,271 :: 		cf_r_ptr =0;             // - сбросить продолжение read
+	_cf_r_ptr <- 0
+//ethernet.c,272 :: 		len += putShConstString("&cf_fat_0read=ok") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,273 :: 		}
+	goto	L_Ethernet_UserTCP_58
+L_Ethernet_UserTCP_57:
+//ethernet.c,275 :: 		else if(!memcmp(getRequest+21, txt_read, 4)) {   // команда 	read:
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_59
+//ethernet.c,276 :: 		fread_num[0] =  getRequest[35];
+	Ethernet_UserTCP_fread_num_L0 <- _getRequest+35
+//ethernet.c,277 :: 		fread_num[1] =  getRequest[36];
+	Ethernet_UserTCP_fread_num_L0+1 <- _getRequest+36
+//ethernet.c,278 :: 		fread_num[2] =  getRequest[37];
+	Ethernet_UserTCP_fread_num_L0+2 <- _getRequest+37
+//ethernet.c,279 :: 		if ( (LOG_TXT[5] !=  fread_num[0]) || (LOG_TXT[6] !=  fread_num[1]) || (LOG_TXT[7] !=  fread_num[2]) ) {
+	if ( _LOG_TXT+5 != _getRequest+35) then goto L679_ex_L_Ethernet_UserTCP_62
+	if ( _LOG_TXT+6 != Ethernet_UserTCP_fread_num_L0+1) then goto L679_ex_L_Ethernet_UserTCP_62
+	if ( _LOG_TXT+7 = Ethernet_UserTCP_fread_num_L0+2) then goto L_Ethernet_UserTCP_62
+L679_ex_L_Ethernet_UserTCP_62:
+//ethernet.c,280 :: 		cf_r_ptr =0;  // поступила команда чтения другого файла
+	_cf_r_ptr <- 0
+//ethernet.c,281 :: 		}
+L_Ethernet_UserTCP_62:
+//ethernet.c,282 :: 		LOG_TXT[5] =  fread_num[0];
+	_LOG_TXT+5 <- Ethernet_UserTCP_fread_num_L0
+//ethernet.c,283 :: 		LOG_TXT[6] =  fread_num[1];
+	_LOG_TXT+6 <- Ethernet_UserTCP_fread_num_L0+1
+//ethernet.c,284 :: 		LOG_TXT[7] =  fread_num[2];
+	_LOG_TXT+7 <- Ethernet_UserTCP_fread_num_L0+2
+//ethernet.c,286 :: 		if(cf_r_ptr ==0) flag_read_fat = 0;  //flag_read_fat: FAT в состоянии read =1, иначе 0
+	if ( _cf_r_ptr != 0) then goto L_Ethernet_UserTCP_63
+	_flag_read_fat <- 0
+L_Ethernet_UserTCP_63:
+//ethernet.c,287 :: 		len += putShConstString("&file_num=");
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,288 :: 		len += putShString(fread_num) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,290 :: 		if(flag_read_fat != 1) { //flag_read_fat: FAT в состоянии read =1, иначе 0
+	if ( _flag_read_fat = 1) then goto L_Ethernet_UserTCP_64
+//ethernet.c,291 :: 		len += putShConstString("&cf_fat_init=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,292 :: 		tmp =  Cf_Fat_Init(&portH,&portE);
+	FARG_Cf_Fat_Init+0 <- 0
+	FARG_Cf_Fat_Init+2 <- 0
+	CALL _Cf_Fat_Init
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,293 :: 		if ( tmp != 0)  {// Cf_Fat_Init err
+	if ( Ethernet_UserTCP_tmp_L0 = 0) then goto L_Ethernet_UserTCP_65
+//ethernet.c,294 :: 		intToStr(tmp, dyna) ;     // Cf_Fat_Init err
+	FARG_IntToStr+0 <- Ethernet_UserTCP_tmp_L0
+	FARG_IntToStr+2 <- 0
+	CALL _IntToStr
+//ethernet.c,295 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,296 :: 		goto  TXT_READ_END;
+	goto	___Ethernet_UserTCP_TXT_READ_END
+//ethernet.c,297 :: 		}
+L_Ethernet_UserTCP_65:
+//ethernet.c,298 :: 		len += putShConstString("ok") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,299 :: 		len += putShConstString("&cf_fat_assign0x00=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,300 :: 		tmp = Cf_Fat_Assign(LOG_TXT,0x00);
+	FARG_Cf_Fat_Assign+0 <- 0
+	FARG_Cf_Fat_Assign+2 <- 0
+	CALL _Cf_Fat_Assign
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,301 :: 		if ( tmp != 1) { // Cf_Fat_Assign   if file does not exist and no new file is created.
+	if ( Ethernet_UserTCP_tmp_L0 = 1) then goto L_Ethernet_UserTCP_66
+//ethernet.c,302 :: 		len += putShConstString("no_file") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,303 :: 		goto  TXT_READ_END;
+	goto	___Ethernet_UserTCP_TXT_READ_END
+//ethernet.c,304 :: 		}
+L_Ethernet_UserTCP_66:
+//ethernet.c,305 :: 		len += putShConstString("file_ok") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,306 :: 		Cf_Fat_Reset(&size);            // To read file, procedure returns size of file
+	FARG_Cf_Fat_Reset+0 <- 0
+	CALL _Cf_Fat_Reset
+//ethernet.c,307 :: 		len += putShConstString("&size=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,308 :: 		My_long_to_str( size, dyna );  // преобразует long число в строку из 11 символов, лидирующие нули
+	FARG_My_long_to_str+0 <- Ethernet_UserTCP_size_L0
+	FARG_My_long_to_str+4 <- 0
+	CALL _My_long_to_str
+//ethernet.c,310 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,311 :: 		} // end    if(flag_read_fat != 1)
+L_Ethernet_UserTCP_64:
+//ethernet.c,312 :: 		len += putShConstString("&cf_fat_read=\n") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,313 :: 		if (cf_r_ptr !=0 )    {      // считывание журнала уже начато
+	if ( _cf_r_ptr = 0) then goto L_Ethernet_UserTCP_67
+//ethernet.c,314 :: 		if(flag_read_fat != 1) { //flag_read_fat: FAT в состоянии read =1, иначе 0
+	if ( _flag_read_fat = 1) then goto L_Ethernet_UserTCP_68
+//ethernet.c,315 :: 		for (i = 1; i < cf_r_ptr ; i++)  // 1..1280
+	Ethernet_UserTCP_i_L0 <- 1
+L_Ethernet_UserTCP_69:
+	if ( Ethernet_UserTCP_i_L0 >= _cf_r_ptr) then goto L_Ethernet_UserTCP_70
+//ethernet.c,317 :: 		Cf_Fat_Read(caracter);    // пройти уже считанное
+	FARG_Cf_Fat_Read+0 <- 0
+	CALL _Cf_Fat_Read
+//ethernet.c,318 :: 		}
+L_Ethernet_UserTCP_71:
+//ethernet.c,315 :: 		for (i = 1; i < cf_r_ptr ; i++)  // 1..1280
+	Ethernet_UserTCP_i_L0 <-  Ethernet_UserTCP_i_L0 + 1
+	Ethernet_UserTCP_i_L0 <- Ethernet_UserTCP_i_L0
+//ethernet.c,318 :: 		}
+	goto	L_Ethernet_UserTCP_69
+L_Ethernet_UserTCP_70:
+//ethernet.c,319 :: 		}
+L_Ethernet_UserTCP_68:
+//ethernet.c,320 :: 		}
+	goto	L_Ethernet_UserTCP_72
+L_Ethernet_UserTCP_67:
+//ethernet.c,321 :: 		else  cf_r_ptr =1;
+	_cf_r_ptr <- 1
+L_Ethernet_UserTCP_72:
+//ethernet.c,322 :: 		flag_read_fat = 1;  //flag_read_fat: FAT в состоянии read =1, иначе 0
+	_flag_read_fat <- 1
+//ethernet.c,323 :: 		j = 0; // число переносов строк
+	Ethernet_UserTCP_j_L0 <- 0
+//ethernet.c,324 :: 		for (i = 1; i < 1361 ; i++)    // i=1..1281
+	Ethernet_UserTCP_i_L0 <- 1
+L_Ethernet_UserTCP_73:
+	if ( Ethernet_UserTCP_i_L0 >= 1361) then goto L_Ethernet_UserTCP_74
+//ethernet.c,326 :: 		Cf_Fat_Read(caracter);
+	FARG_Cf_Fat_Read+0 <- 0
+	CALL _Cf_Fat_Read
+//ethernet.c,327 :: 		caracter[1] = '\0';
+	Ethernet_UserTCP_caracter_L0+1 <- 0
+//ethernet.c,328 :: 		len += putShString(caracter) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,329 :: 		cf_r_ptr++;
+	_cf_r_ptr <-  _cf_r_ptr + 1
+	_cf_r_ptr <- _cf_r_ptr
+//ethernet.c,330 :: 		if (cf_r_ptr > size) {cf_r_ptr = 0; len += putShConstString("\n&continued=false") ; break; } // вывод завершен
+	if ( _cf_r_ptr <= Ethernet_UserTCP_size_L0) then goto L_Ethernet_UserTCP_76
+	_cf_r_ptr <- 0
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	L_Ethernet_UserTCP_74
+L_Ethernet_UserTCP_76:
+//ethernet.c,331 :: 		if (caracter[0]=='\n') j++;
+	if ( Ethernet_UserTCP_caracter_L0 != 10) then goto L_Ethernet_UserTCP_77
+	Ethernet_UserTCP_j_L0 <-  Ethernet_UserTCP_j_L0 + 1
+	Ethernet_UserTCP_j_L0 <- Ethernet_UserTCP_j_L0
+L_Ethernet_UserTCP_77:
+//ethernet.c,332 :: 		if (j==4) { len+= putShConstString("&continued=true"); break;}   // вывод 10 строк завершен
+	if ( Ethernet_UserTCP_j_L0 != 4) then goto L_Ethernet_UserTCP_78
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	L_Ethernet_UserTCP_74
+L_Ethernet_UserTCP_78:
+//ethernet.c,333 :: 		if ( i == 1360 )  {len += putShConstString("\n&continued=error"); break; }  // ошибка формата записи :вывод макс числа символов завершен
+	if ( Ethernet_UserTCP_i_L0 != 1360) then goto L_Ethernet_UserTCP_79
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+	goto	L_Ethernet_UserTCP_74
+L_Ethernet_UserTCP_79:
+//ethernet.c,335 :: 		}
+L_Ethernet_UserTCP_75:
+//ethernet.c,324 :: 		for (i = 1; i < 1361 ; i++)    // i=1..1281
+	Ethernet_UserTCP_i_L0 <-  Ethernet_UserTCP_i_L0 + 1
+	Ethernet_UserTCP_i_L0 <- Ethernet_UserTCP_i_L0
+//ethernet.c,335 :: 		}
+	goto	L_Ethernet_UserTCP_73
+L_Ethernet_UserTCP_74:
+//ethernet.c,336 :: 		TXT_READ_END:  tmp =0;
+___Ethernet_UserTCP_TXT_READ_END:
+	Ethernet_UserTCP_tmp_L0 <- 0
+//ethernet.c,337 :: 		} // end else if(!memcmp(getRequest+21, txt_read, 4))    // команда 	read:
+	goto	L_Ethernet_UserTCP_80
+L_Ethernet_UserTCP_59:
+//ethernet.c,341 :: 		else if(!memcmp(getRequest+21, txt_cf_d, 4))   { // команда 	cf_d:
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_81
+//ethernet.c,342 :: 		len += putShConstString("&\ncf_fat_init=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,343 :: 		tmp =  Cf_Fat_Init(&portH,&portE);
+	FARG_Cf_Fat_Init+0 <- 0
+	FARG_Cf_Fat_Init+2 <- 0
+	CALL _Cf_Fat_Init
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,344 :: 		if ( tmp == 0) { // Cf_Fat_Init
+	if ( Ethernet_UserTCP_tmp_L0 != 0) then goto L_Ethernet_UserTCP_82
+//ethernet.c,345 :: 		len += putShConstString(" ok ") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,346 :: 		len += putShConstString("\ncf_fat_assign0x00=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,347 :: 		tmp = Cf_Fat_Assign(LOG_TXT,0x00);
+	FARG_Cf_Fat_Assign+0 <- 0
+	FARG_Cf_Fat_Assign+2 <- 0
+	CALL _Cf_Fat_Assign
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,348 :: 		if ( tmp == 0) { // Cf_Fat_Assign
+	if ( Ethernet_UserTCP_tmp_L0 != 0) then goto L_Ethernet_UserTCP_83
+//ethernet.c,349 :: 		len += putShConstString("no file") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,350 :: 		}
+	goto	L_Ethernet_UserTCP_84
+L_Ethernet_UserTCP_83:
+//ethernet.c,351 :: 		else if ( tmp == 1) { // Cf_Fat_Assign
+	if ( Ethernet_UserTCP_tmp_L0 != 1) then goto L_Ethernet_UserTCP_85
+//ethernet.c,352 :: 		len += putShConstString("file ok") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,353 :: 		len += putShConstString("\ncf_fat_delete=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,354 :: 		Cf_Fat_Delete();
+	CALL _Cf_Fat_Delete
+//ethernet.c,355 :: 		cf_r_ptr = 0;
+	_cf_r_ptr <- 0
+//ethernet.c,356 :: 		len += putShConstString(" ok ") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,357 :: 		} // end else if ( tmp == 1)  // Cf_Fat_Assign
+	goto	L_Ethernet_UserTCP_86
+L_Ethernet_UserTCP_85:
+//ethernet.c,359 :: 		intToStr(tmp, dyna) ;     // Cf_Fat_Assign err
+	FARG_IntToStr+0 <- Ethernet_UserTCP_tmp_L0
+	FARG_IntToStr+2 <- 0
+	CALL _IntToStr
+//ethernet.c,360 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,361 :: 		}
+L_Ethernet_UserTCP_86:
+L_Ethernet_UserTCP_84:
+//ethernet.c,362 :: 		}   // end if ( tmp == 0)  // Cf_Fat_Init
+	goto	L_Ethernet_UserTCP_87
+L_Ethernet_UserTCP_82:
+//ethernet.c,364 :: 		intToStr(tmp, dyna) ;     // Cf_Fat_Init err
+	FARG_IntToStr+0 <- Ethernet_UserTCP_tmp_L0
+	FARG_IntToStr+2 <- 0
+	CALL _IntToStr
+//ethernet.c,365 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,366 :: 		}
+L_Ethernet_UserTCP_87:
+//ethernet.c,367 :: 		}
+	goto	L_Ethernet_UserTCP_88
+L_Ethernet_UserTCP_81:
+//ethernet.c,369 :: 		else   goto ILLEGAL_COMMAND;
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_88:
+L_Ethernet_UserTCP_80:
+L_Ethernet_UserTCP_58:
+L_Ethernet_UserTCP_56:
+L_Ethernet_UserTCP_54:
+L_Ethernet_UserTCP_49:
+L_Ethernet_UserTCP_44:
+L_Ethernet_UserTCP_42:
+//ethernet.c,371 :: 		} // end if ( cmd_port_num == 0)  // команда для всей стойки
+	goto	L_Ethernet_UserTCP_89
+L_Ethernet_UserTCP_25:
+//ethernet.c,374 :: 		if(!memcmp(getRequest+21, txt_open, 4))  { // команда open
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_90
+//ethernet.c,375 :: 		len += putShConstString("&open_port=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,376 :: 		Num_to_0str(cmd_port_num, dyna);  // преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	FARG_Num_to_0str+0 <- _cmd_port_num
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,378 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,379 :: 		if ( (cmd_port_num > 40) || (cmd_port_num < 1) ) goto ILLEGAL_COMMAND;
+	if ( _cmd_port_num > 40) then goto L947_ex_L_Ethernet_UserTCP_93
+	if ( _cmd_port_num >= 1) then goto L_Ethernet_UserTCP_93
+L947_ex_L_Ethernet_UserTCP_93:
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_93:
+//ethernet.c,380 :: 		open_port(cmd_port_num);
+	FARG_open_port+0 <- _cmd_port_num
+	CALL _open_port
+//ethernet.c,381 :: 		l_w_port(cmd_port_num);   //запись в строку dyna начала строки с номером порта( 7 символов)
+	FARG_l_w_port+0 <- _cmd_port_num
+	CALL _l_w_port
+//ethernet.c,383 :: 		len += putShConstString("&result=accepted") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,384 :: 		}
+	goto	L_Ethernet_UserTCP_94
+L_Ethernet_UserTCP_90:
+//ethernet.c,386 :: 		else if(!memcmp(getRequest+21, txt_close, 4))  {  // команда CLOSE
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_95
+//ethernet.c,387 :: 		len += putShConstString("&close_port=") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,388 :: 		Num_to_0str(cmd_port_num, dyna);  // преобразует число (0..255) в строку из трех символов  лидирующие - нули
+	FARG_Num_to_0str+0 <- _cmd_port_num
+	FARG_Num_to_0str+1 <- 0
+	CALL _Num_to_0str
+//ethernet.c,390 :: 		len += putShString(dyna) ;
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,391 :: 		if ( (cmd_port_num > 40) || (cmd_port_num < 1) ) goto ILLEGAL_COMMAND;
+	if ( _cmd_port_num > 40) then goto L987_ex_L_Ethernet_UserTCP_98
+	if ( _cmd_port_num >= 1) then goto L_Ethernet_UserTCP_98
+L987_ex_L_Ethernet_UserTCP_98:
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_98:
+//ethernet.c,392 :: 		close_port(cmd_port_num);
+	FARG_close_port+0 <- _cmd_port_num
+	CALL _close_port
+//ethernet.c,393 :: 		l_w_port(cmd_port_num);   //запись в строку dyna начала строки с номером порта( 7 символов)
+	FARG_l_w_port+0 <- _cmd_port_num
+	CALL _l_w_port
+//ethernet.c,395 :: 		len += putShConstString("&result=accepted") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,396 :: 		}
+	goto	L_Ethernet_UserTCP_99
+L_Ethernet_UserTCP_95:
+//ethernet.c,398 :: 		else if(!memcmp(getRequest+21, txt_status, 4)) {   // команда status  ячеек
+	FARG_memcmp+0 <- 0
+	FARG_memcmp+2 <- 0
+	FARG_memcmp+4 <- 4
+	CALL _memcmp
+	if (STACK_0) then goto L_Ethernet_UserTCP_100
+//ethernet.c,399 :: 		l_w_port(cmd_port_num);   //запись в строку dyna начала строки с номером порта( 7 символов)
+	FARG_l_w_port+0 <- _cmd_port_num
+	CALL _l_w_port
+//ethernet.c,401 :: 		if (cmd_port_num > 40) goto ILLEGAL_COMMAND;
+	if ( _cmd_port_num > 40) then goto ___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_101:
+//ethernet.c,402 :: 		len += putShConstString("&state=ok") ;
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,403 :: 		sprintf(tmpBuf,"&cell_%02d=",cmd_port_num);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	FARG_sprintf+5 <- _cmd_port_num
+	CALL _sprintf
+//ethernet.c,404 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,405 :: 		if(cellState[cmd_port_num][4]=='8') {
+	STACK_0 <-  5 * _cmd_port_num
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	STACK_2 <- *FSR0L
+	if ( STACK_2 != 56) then goto L_Ethernet_UserTCP_102
+//ethernet.c,406 :: 		len += putShConstString("no\r\n");
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,407 :: 		}
+	goto	L_Ethernet_UserTCP_103
+L_Ethernet_UserTCP_102:
+//ethernet.c,409 :: 		sprintf(tmpBuf,"%c,",cellState[cmd_port_num][0]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * _cmd_port_num
+	FSR0L <-  0 + STACK_0
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,410 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,411 :: 		sprintf(tmpBuf,"%c,",cellState[cmd_port_num][1]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * _cmd_port_num
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 1
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,412 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,413 :: 		sprintf(tmpBuf,"%c,",cellState[cmd_port_num][2]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * _cmd_port_num
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 2
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,414 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,415 :: 		sprintf(tmpBuf,"%c,",cellState[cmd_port_num][3]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * _cmd_port_num
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 3
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,416 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,417 :: 		sprintf(tmpBuf,"%c",cellState[cmd_port_num][4]);
+	FARG_sprintf+0 <- 0
+	FARG_sprintf+2 <- 0
+	STACK_0 <-  5 * _cmd_port_num
+	STACK_0 <-  0 + STACK_0
+	FSR0L <-  STACK_0 + 4
+	FARG_sprintf+5 <- *FSR0L
+	FARG_sprintf+5 <- FARG_sprintf+5
+	CALL _sprintf
+//ethernet.c,418 :: 		len += putShString(tmpBuf);
+	FARG_putShString+0 <- 0
+	CALL _putShString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,419 :: 		}
+L_Ethernet_UserTCP_103:
+//ethernet.c,420 :: 		}  // end  if(!memcmp(getRequest+21, txt_status, 4))    // команда status
+	goto	L_Ethernet_UserTCP_104
+L_Ethernet_UserTCP_100:
+//ethernet.c,422 :: 		else   goto ILLEGAL_COMMAND;
+	goto	___Ethernet_UserTCP_ILLEGAL_COMMAND
+L_Ethernet_UserTCP_104:
+L_Ethernet_UserTCP_99:
+L_Ethernet_UserTCP_94:
+//ethernet.c,424 :: 		}  // end  else    // команда для ячейки в стойке
+L_Ethernet_UserTCP_89:
+//ethernet.c,426 :: 		}  // end          if(!memcmp(getRequest+5, txt_port, 4))                          // начало команды:  port
+	goto	L_Ethernet_UserTCP_105
+L_Ethernet_UserTCP_8:
+//ethernet.c,428 :: 		ILLEGAL_COMMAND:   len += putShConstString("result=illegal_command") ;
+___Ethernet_UserTCP_ILLEGAL_COMMAND:
+	FARG_putShConstString+0 <- 0
+	CALL _putShConstString
+	Ethernet_UserTCP_len_L0 <-  Ethernet_UserTCP_len_L0 + STACK_0
+	Ethernet_UserTCP_len_L0 <- Ethernet_UserTCP_len_L0
+//ethernet.c,429 :: 		tmp =Set_fnum();
+	CALL _Set_fnum
+	Ethernet_UserTCP_tmp_L0 <- STACK_0
+//ethernet.c,430 :: 		log_write ( CMD, " illegal_command             ", tmp );   // записать в журнал - команда  (28 символов )
+	FARG_log_write+0 <- 3
+	FARG_log_write+1 <- 0
+	FARG_log_write+3 <- Ethernet_UserTCP_tmp_L0
+	CALL _log_write
+//ethernet.c,431 :: 		}
+L_Ethernet_UserTCP_105:
+//ethernet.c,432 :: 		Led_Y  = 1;  // выключить желтый сд
+	PORTC <-  PORTC | 2
+//ethernet.c,433 :: 		return(len) ;                                           // return to the library with the number of bytes to transmit
+	STACK_0 <- Ethernet_UserTCP_len_L0
+	return
+  end
+
+_Ethernet_UserUDP:
+  begin
+//ethernet.c,450 :: 		return(len) ;           // back to the library with the length of the UDP reply
+	STACK_0 <- 0
+	return
+  end
+
+_My_str_n:
+  begin
+//ethernet.c,457 :: 		tmp1= tmp2= tmp3 =0;
+	My_str_n_tmp3_L0 <- 0
+	My_str_n_tmp2_L0 <- 0
+	My_str_n_tmp1_L0 <- 0
+//ethernet.c,458 :: 		for (i=1; i<(n+1); i++)  // i=1..84      !!!
+	My_str_n_i_L0 <- 1
+L_My_str_n_106:
+	STACK_2 <-  FARG_My_str_n+4 + 1
+	if ( My_str_n_i_L0 >= STACK_2) then goto L_My_str_n_107
+//ethernet.c,460 :: 		tmp1= tmp2;               // проверочный набор символов  tmp1, tmp2, tmp3, tmp
+	My_str_n_tmp1_L0 <- My_str_n_tmp2_L0
+//ethernet.c,461 :: 		tmp2= tmp3;
+	My_str_n_tmp2_L0 <- My_str_n_tmp3_L0
+//ethernet.c,462 :: 		tmp3= tmp;
+	My_str_n_tmp3_L0 <- My_str_n_tmp_L0
+//ethernet.c,463 :: 		tmp = *(s_source + (i+4) );
+	STACK_0 <-  My_str_n_i_L0 + 4
+	FSR0L <-  FARG_My_str_n+2 + STACK_0
+	STACK_2 <- *FSR0L
+	My_str_n_tmp_L0 <- STACK_2
+//ethernet.c,466 :: 		if (tmp == '\0') break;
+	if ( STACK_2 = 0) then goto L_My_str_n_107
+L_My_str_n_109:
+//ethernet.c,470 :: 		if ( (tmp != 0x0D) && (tmp != 0x0A) )   // вырезать переносы строк
+	if ( My_str_n_tmp_L0 = 13) then goto L_My_str_n_112
+	if ( My_str_n_tmp_L0 = 10) then goto L_My_str_n_112
+L1067_ex_L_My_str_n_112:
+//ethernet.c,472 :: 		*(s_out + (i-1) ) = tmp ;
+	STACK_0 <-  My_str_n_i_L0 - 1
+	FSR1L <-  FARG_My_str_n+0 + STACK_0
+	*FSR1L <- My_str_n_tmp_L0
+//ethernet.c,473 :: 		}
+L_My_str_n_112:
+//ethernet.c,474 :: 		if ( (tmp1 == 'H') &&  (tmp2 == 'T') &&  (tmp3 == 'T') &&  (tmp == 'P') )
+	if ( My_str_n_tmp1_L0 != 72) then goto L_My_str_n_115
+	if ( My_str_n_tmp2_L0 != 84) then goto L_My_str_n_115
+	if ( My_str_n_tmp3_L0 != 84) then goto L_My_str_n_115
+	if ( My_str_n_tmp_L0 != 80) then goto L_My_str_n_115
+L1086_ex_L_My_str_n_115:
+//ethernet.c,476 :: 		i++;
+	My_str_n_i_L0 <-  My_str_n_i_L0 + 1
+	My_str_n_i_L0 <- My_str_n_i_L0
+//ethernet.c,477 :: 		break;     //  HTTP - конец инф-ции
+	goto	L_My_str_n_107
+//ethernet.c,478 :: 		}
+L_My_str_n_115:
+//ethernet.c,479 :: 		}
+L_My_str_n_108:
+//ethernet.c,458 :: 		for (i=1; i<(n+1); i++)  // i=1..84      !!!
+	My_str_n_i_L0 <-  My_str_n_i_L0 + 1
+	My_str_n_i_L0 <- My_str_n_i_L0
+//ethernet.c,479 :: 		}
+	goto	L_My_str_n_106
+L_My_str_n_107:
+//ethernet.c,480 :: 		for (k=i; k<85; k++)  // k=1..84              // добавить до 84 символов
+	My_str_n_k_L0 <- My_str_n_i_L0
+L_My_str_n_116:
+	if ( My_str_n_k_L0 >= 85) then goto L_My_str_n_117
+//ethernet.c,482 :: 		*(s_out + (k-1) ) = '_' ;
+	STACK_0 <-  My_str_n_k_L0 - 1
+	FSR1L <-  FARG_My_str_n+0 + STACK_0
+	*FSR1L <- 95
+//ethernet.c,483 :: 		}
+L_My_str_n_118:
+//ethernet.c,480 :: 		for (k=i; k<85; k++)  // k=1..84              // добавить до 84 символов
+	My_str_n_k_L0 <-  My_str_n_k_L0 + 1
+	My_str_n_k_L0 <- My_str_n_k_L0
+//ethernet.c,483 :: 		}
+	goto	L_My_str_n_116
+L_My_str_n_117:
+  end
+
+_l_w_port:
+  begin
+//ethernet.c,491 :: 		dyna[0] = '_';
+	_dyna <- 95
+//ethernet.c,492 :: 		dyna[1] = 'p';
+	_dyna+1 <- 112
+//ethernet.c,493 :: 		dyna[2] = 'o';
+	_dyna+2 <- 111
+//ethernet.c,494 :: 		dyna[3] = 'r';
+	_dyna+3 <- 114
+//ethernet.c,495 :: 		dyna[4] = 't';
+	_dyna+4 <- 116
+//ethernet.c,496 :: 		ByteToStr(cmd_port_num, tmp) ;
+	FARG_ByteToStr+0 <- FARG_l_w_port+0
+	FARG_ByteToStr+1 <- 0
+	CALL _ByteToStr
+//ethernet.c,497 :: 		dyna[5] = tmp[1];
+	_dyna+5 <- l_w_port_tmp_L0+1
+//ethernet.c,498 :: 		dyna[6] = tmp[2];
+	_dyna+6 <- l_w_port_tmp_L0+2
+//ethernet.c,499 :: 		dyna[7] = '\0';
+	_dyna+7 <- 0
+  end
+
+_My_long_to_str:
+  begin
+//ethernet.c,507 :: 		LongToStr(size, tmp) ;
+	FARG_LongToStr+0 <- FARG_My_long_to_str+0
+	FARG_LongToStr+4 <- 0
+	CALL _LongToStr
+//ethernet.c,508 :: 		for (i=0; i< 12; i++)  // i=  0..11
+	My_long_to_str_i_L0 <- 0
+L_My_long_to_str_119:
+	if ( My_long_to_str_i_L0 >= 12) then goto L_My_long_to_str_120
+//ethernet.c,510 :: 		if (tmp[i] == ' ') tmp[i] = '0';
+	FSR0L <-  0 + My_long_to_str_i_L0
+	STACK_1 <- *FSR0L
+	if ( STACK_1 != 32) then goto L_My_long_to_str_122
+	FSR1L <-  0 + My_long_to_str_i_L0
+	*FSR1L <- 48
+L_My_long_to_str_122:
+//ethernet.c,511 :: 		*(s_out + i ) = tmp[i];
+	FSR1L <-  FARG_My_long_to_str+4 + My_long_to_str_i_L0
+	FSR0L <-  0 + My_long_to_str_i_L0
+	STACK_0 <- *FSR0L
+	*FSR1L <- STACK_0
+//ethernet.c,512 :: 		}
+L_My_long_to_str_121:
+//ethernet.c,508 :: 		for (i=0; i< 12; i++)  // i=  0..11
+	My_long_to_str_i_L0 <-  My_long_to_str_i_L0 + 1
+	My_long_to_str_i_L0 <- My_long_to_str_i_L0
+//ethernet.c,512 :: 		}
+	goto	L_My_long_to_str_119
+L_My_long_to_str_120:
+  end
+
+_putShConstString:
+  begin
+//ethernet.c,518 :: 		unsigned int    len2 = 0 ;                   // my reply length
+	putShConstString_len2_L0 <- 0
+//ethernet.c,546 :: 		while (*ptr != 0)
+L_putShConstString_123:
+	STACK_2 <- *FARG_putShConstString+0
+	if ( STACK_2 = 0) then goto L_putShConstString_124
+//ethernet.c,548 :: 		cod_inbyte = (*ptr) ;
+	putShConstString_cod_outbyte_L0 <- *FARG_putShConstString+0
+//ethernet.c,549 :: 		cod_outbyte[0] = cod_inbyte;
+	putShConstString_cod_outbyte_L0 <- putShConstString_cod_outbyte_L0
+//ethernet.c,550 :: 		cod_outbyte[1] = 0;
+	putShConstString_cod_outbyte_L0+1 <- 0
+//ethernet.c,551 :: 		len2+= putString(cod_outbyte) ;
+	FARG_Ethernet_putString+0 <- 0
+	CALL _Ethernet_putString
+	putShConstString_len2_L0 <-  putShConstString_len2_L0 + STACK_0
+	putShConstString_len2_L0 <- putShConstString_len2_L0
+//ethernet.c,552 :: 		ptr++;
+	FARG_putShConstString+0 <-  FARG_putShConstString+0 + 1
+	FARG_putShConstString+0 <- FARG_putShConstString+0
+//ethernet.c,553 :: 		}
+	goto	L_putShConstString_123
+L_putShConstString_124:
+//ethernet.c,554 :: 		return (len2);
+	STACK_0 <- putShConstString_len2_L0
+	return
+  end
+
+_putShString:
+  begin
+//ethernet.c,563 :: 		unsigned int    len2 = 0 ;                   // my reply length
+	putShString_len2_L0 <- 0
+//ethernet.c,591 :: 		while (*ptr != 0)
+L_putShString_125:
+	STACK_2 <- *FARG_putShString+0
+	if ( STACK_2 = 0) then goto L_putShString_126
+//ethernet.c,593 :: 		cod_inbyte = (*ptr) ;
+	putShString_cod_outbyte_L0 <- *FARG_putShString+0
+//ethernet.c,594 :: 		cod_outbyte[0] = cod_inbyte;
+	putShString_cod_outbyte_L0 <- putShString_cod_outbyte_L0
+//ethernet.c,595 :: 		cod_outbyte[1] = 0;
+	putShString_cod_outbyte_L0+1 <- 0
+//ethernet.c,596 :: 		len2+= putString(cod_outbyte) ;
+	FARG_Ethernet_putString+0 <- 0
+	CALL _Ethernet_putString
+	putShString_len2_L0 <-  putShString_len2_L0 + STACK_0
+	putShString_len2_L0 <- putShString_len2_L0
+//ethernet.c,597 :: 		ptr++;
+	FARG_putShString+0 <-  FARG_putShString+0 + 1
+	FARG_putShString+0 <- FARG_putShString+0
+//ethernet.c,598 :: 		}
+	goto	L_putShString_125
+L_putShString_126:
+//ethernet.c,599 :: 		return (len2);
+	STACK_0 <- putShString_len2_L0
+	return
+  end
+
+GlobalIniethernet:
+  begin
+  end
+

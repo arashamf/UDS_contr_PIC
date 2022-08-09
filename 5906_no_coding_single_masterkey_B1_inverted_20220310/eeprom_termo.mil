@@ -1,0 +1,91 @@
+_ip_write:
+  begin
+//eeprom_termo.c,26 :: 		I2C_Init(100000);      // initialize full master mode
+	asm: MOVLW	62
+	asm: MOVWF	SSPADD
+	CALL _I2C_Init
+//eeprom_termo.c,27 :: 		I2C_Start();          // issue start signal
+	CALL _I2C_Start
+//eeprom_termo.c,28 :: 		I2C_Wr(0xA0);         // Slave address m24c16, write
+	FARG_I2C_Wr+0 <- 160
+	CALL _I2C_Wr
+//eeprom_termo.c,29 :: 		I2C_Wr(0x00);         // Byte adress
+	FARG_I2C_Wr+0 <- 0
+	CALL _I2C_Wr
+//eeprom_termo.c,31 :: 		I2C_Wr(myIpAddr[0]);            // запись 1-го байта IP
+	FARG_I2C_Wr+0 <- _myIpAddr
+	CALL _I2C_Wr
+//eeprom_termo.c,32 :: 		I2C_Wr(myIpAddr[1]);         // 2
+	FARG_I2C_Wr+0 <- _myIpAddr+1
+	CALL _I2C_Wr
+//eeprom_termo.c,33 :: 		I2C_Wr(myIpAddr[2]);         // 3
+	FARG_I2C_Wr+0 <- _myIpAddr+2
+	CALL _I2C_Wr
+//eeprom_termo.c,34 :: 		I2C_Wr(myIpAddr[3]);         // 4
+	FARG_I2C_Wr+0 <- _myIpAddr+3
+	CALL _I2C_Wr
+//eeprom_termo.c,35 :: 		I2C_Stop();           // issue stop signal
+	CALL _I2C_Stop
+//eeprom_termo.c,37 :: 		I2C_Start();          // issue start signal
+	CALL _I2C_Start
+//eeprom_termo.c,38 :: 		I2C_Wr(0xA0);         // Slave address m24c16, write
+	FARG_I2C_Wr+0 <- 160
+	CALL _I2C_Wr
+//eeprom_termo.c,39 :: 		I2C_Wr(0x01);         // Byte adress
+	FARG_I2C_Wr+0 <- 1
+	CALL _I2C_Wr
+//eeprom_termo.c,41 :: 		I2C_Wr('E');            // запись 1-го символа
+	FARG_I2C_Wr+0 <- 69
+	CALL _I2C_Wr
+//eeprom_termo.c,42 :: 		I2C_Wr('E');         // 2
+	FARG_I2C_Wr+0 <- 69
+	CALL _I2C_Wr
+//eeprom_termo.c,43 :: 		I2C_Wr('E');         // 3
+	FARG_I2C_Wr+0 <- 69
+	CALL _I2C_Wr
+//eeprom_termo.c,44 :: 		I2C_Wr('E');         // 4
+	FARG_I2C_Wr+0 <- 69
+	CALL _I2C_Wr
+//eeprom_termo.c,45 :: 		I2C_Stop();           // issue stop signal
+	CALL _I2C_Stop
+  end
+
+_ip_read:
+  begin
+//eeprom_termo.c,54 :: 		I2C_Init(100000);         // initialize I2C
+	asm: MOVLW	62
+	asm: MOVWF	SSPADD
+	CALL _I2C_Init
+//eeprom_termo.c,55 :: 		I2C_Start();
+	CALL _I2C_Start
+//eeprom_termo.c,56 :: 		I2C_Wr(0xA0);                 // Slave address m24c16, write
+	FARG_I2C_Wr+0 <- 160
+	CALL _I2C_Wr
+//eeprom_termo.c,57 :: 		I2C_Wr(0x00);                 // Byte adress
+	FARG_I2C_Wr+0 <- 0
+	CALL _I2C_Wr
+//eeprom_termo.c,58 :: 		I2C_Repeated_Start();
+	CALL _I2C_Repeated_Start
+//eeprom_termo.c,59 :: 		I2C_Wr(0xA1);                 // Slave address m24c16, read
+	FARG_I2C_Wr+0 <- 161
+	CALL _I2C_Wr
+//eeprom_termo.c,61 :: 		myIpAddr[0] =I2C_Rd(1);         // чтение 1-го байта IP
+	FARG_I2C_Rd+0 <- 1
+	CALL _I2C_Rd
+	_myIpAddr <- STACK_0
+//eeprom_termo.c,63 :: 		myIpAddr[1] =I2C_Rd(1);         //
+	FARG_I2C_Rd+0 <- 1
+	CALL _I2C_Rd
+	_myIpAddr+1 <- STACK_0
+//eeprom_termo.c,65 :: 		myIpAddr[2] =I2C_Rd(1);         //
+	FARG_I2C_Rd+0 <- 1
+	CALL _I2C_Rd
+	_myIpAddr+2 <- STACK_0
+//eeprom_termo.c,67 :: 		myIpAddr[3] =I2C_Rd(1);         //
+	FARG_I2C_Rd+0 <- 1
+	CALL _I2C_Rd
+	_myIpAddr+3 <- STACK_0
+//eeprom_termo.c,69 :: 		I2C_Stop();
+	CALL _I2C_Stop
+  end
+
